@@ -1,0 +1,1556 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>求职公司库 + 投递看板 + JD 收集</title>
+  <style>
+    :root{
+      --bg:#070a14;
+      --card:#111a33;
+      --card2:#0f1730;
+      --text:#e9ecff;
+      --muted:rgba(233,236,255,.68);
+      --muted2:rgba(233,236,255,.42);
+      --line:#22305b;
+      --accent:#7aa2ff;
+      --good:#3ddc97;
+      --warn:#ffd166;
+      --bad:#ff6b6b;
+      --shadow: 0 12px 40px rgba(0,0,0,.42);
+      --radius:18px;
+      --radius2:14px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, "Noto Sans", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      --c1:#7aa2ff; --c2:#3ddc97; --c3:#ffd166; --c4:#ff6b6b; --c5:#c084fc; --c6:#94a3b8;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:var(--sans);
+      color:var(--text);
+      background:
+        radial-gradient(1200px 800px at 12% 0%, #1c2a63 0%, rgba(28,42,99,0) 55%),
+        radial-gradient(900px 600px at 86% 8%, #3b1f5c 0%, rgba(59,31,92,0) 55%),
+        linear-gradient(180deg, var(--bg), #050711 70%);
+      min-height:100vh;
+    }
+    a{color:inherit}
+    .wrap{max-width:1320px;margin:0 auto;padding:22px 18px 60px;}
+    header{display:flex; gap:14px; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; margin-bottom:14px;}
+    h1{margin:0;font-size:26px;letter-spacing:.2px}
+    .sub{color:var(--muted);font-size:13px;line-height:1.45;max-width:900px}
+    .pill{
+      display:inline-flex; align-items:center; gap:6px;
+      padding:6px 10px; border-radius:999px;
+      border:1px solid rgba(122,162,255,.25);
+      background: rgba(122,162,255,.10);
+      font-size:12px; color:#dbe6ff; white-space:nowrap;
+      margin-right:6px; margin-top:6px;
+    }
+    .pill.good{border-color:rgba(61,220,151,.25);background:rgba(61,220,151,.10)}
+    .pill.warn{border-color:rgba(255,209,102,.25);background:rgba(255,209,102,.10)}
+    .pill.bad{border-color:rgba(255,107,107,.25);background:rgba(255,107,107,.10)}
+
+    .toolbar{display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:flex-end}
+    button, .btn{
+      border:1px solid var(--line);
+      background: linear-gradient(180deg, #18244b, #111a33);
+      color:var(--text);
+      padding:10px 12px;
+      border-radius:12px;
+      cursor:pointer;
+      box-shadow: 0 8px 18px rgba(0,0,0,.25);
+      font-weight:800;
+      font-size:13px;
+      transition: transform .06s ease, border-color .15s ease;
+      user-select:none;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      text-decoration:none;
+    }
+    button:hover, .btn:hover{ border-color:#3853a8;}
+    button:active, .btn:active{ transform: translateY(1px); }
+    button.secondary{ background: linear-gradient(180deg, #131a34, #0d1328); }
+    button.danger{ background: linear-gradient(180deg, #3a1621, #22111a); border-color:#6b2a3c; }
+
+    .layout{display:grid; grid-template-columns: 300px 1fr; gap:14px; margin-top: 14px;}
+    @media (max-width: 980px){ .layout{grid-template-columns:1fr} .side{position:static} }
+
+    .card{
+      background: linear-gradient(180deg, rgba(17,26,51,.92), rgba(10,14,28,.85));
+      border:1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding:16px;
+    }
+    .side{position: sticky; top: 12px; height: fit-content;}
+
+    .navTitle{font-size:12px;color:var(--muted2);font-weight:900;letter-spacing:.45px;margin-bottom:10px}
+    .tabs{display:flex; gap:10px; margin-bottom:12px}
+    .tab{
+      flex:1; text-align:center; padding:10px 10px;
+      border-radius:14px; border:1px solid rgba(34,48,91,.95);
+      background: rgba(10,14,28,.55);
+      cursor:pointer; user-select:none; font-weight:900; font-size:13px;
+    }
+    .tab.active{border-color:rgba(122,162,255,.45); background: rgba(122,162,255,.10)}
+
+    .boardList{display:grid; gap:8px}
+    .boardBtn{
+      padding:10px 10px;
+      border-radius:14px;
+      border:1px solid rgba(34,48,91,.95);
+      background: rgba(10,14,28,.55);
+      cursor:pointer; user-select:none;
+    }
+    .boardBtn.active{border-color:rgba(122,162,255,.45); background: rgba(122,162,255,.10)}
+    .boardBtn .name{font-weight:900; font-size:13px}
+    .boardBtn .desc{margin-top:4px;color:var(--muted2);font-size:12px;line-height:1.35}
+
+    .sectionTitle{display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:10px}
+    .sectionTitle h2{margin:0;font-size:16px;letter-spacing:.2px}
+    .muted{color:var(--muted); font-size:12px; line-height:1.4}
+    .small{font-size:12px;color:var(--muted2)}
+
+    input[type="text"], input[type="url"], input[type="date"], textarea, select{
+      width:100%;
+      background: rgba(7,10,20,.55);
+      border:1px solid var(--line);
+      color: var(--text);
+      padding:10px 10px;
+      border-radius:12px;
+      outline:none;
+      font-size:13px;
+    }
+    textarea{min-height:120px; resize:vertical; line-height:1.4}
+    label{display:block;font-size:12px;color:var(--muted); margin:0 0 6px 2px; font-weight:900}
+
+    .fields{display:grid; grid-template-columns: 1.2fr .8fr .8fr; gap:10px; margin-top:10px}
+    @media (max-width: 980px){ .fields{grid-template-columns:1fr} }
+
+    .actionsRow{display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:space-between; margin-top:10px}
+    .leftActions{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+    .rightActions{display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:flex-end}
+
+    .chip{
+      display:inline-flex; align-items:center;
+      padding:5px 9px;
+      border-radius:999px;
+      background: rgba(26,37,80,.75);
+      border:1px solid rgba(34,48,91,.9);
+      font-size:12px;
+      color:#dbe2ff;
+      margin-right:6px;
+      margin-top:6px;
+    }
+    .chip.tag{background: rgba(122,162,255,.10); border-color: rgba(122,162,255,.22);}
+
+    .badge{display:inline-flex; align-items:center; gap:6px; font-size:12px; padding:6px 10px; border-radius:999px; border:1px solid rgba(233,236,255,.16); background: rgba(233,236,255,.07);}
+    .badge strong{font-size:13px}
+
+    .tableWrap{margin-top:12px;border:1px solid var(--line);border-radius: var(--radius);overflow:auto;}
+    table{width:100%; border-collapse:separate; border-spacing:0; background: rgba(10,14,28,.55); min-width: 880px;}
+    thead th{
+      text-align:left;
+      font-size:12px;
+      color: var(--muted);
+      font-weight:900;
+      padding:10px 10px;
+      border-bottom:1px solid var(--line);
+      background: rgba(17,26,51,.8);
+      position:sticky; top:0; z-index:2;
+      cursor:pointer; user-select:none;
+    }
+    tbody td{padding:10px 10px; border-bottom:1px solid rgba(34,48,91,.65); vertical-align:top;}
+    tbody tr:hover td{background: rgba(122,162,255,.06);}
+
+    .companyCell .cn{font-weight:950; letter-spacing:.2px; font-size:14px}
+    .companyCell .en{font-size:12px; color: var(--muted); margin-top:3px}
+    .tiny{font-family:var(--mono); font-size:11px; color: rgba(233,236,255,.60); word-break:break-all;}
+    .linkbtn{
+      padding:7px 10px;
+      border-radius:10px;
+      border:1px solid rgba(122,162,255,.25);
+      background: rgba(122,162,255,.10);
+      text-decoration:none;
+      font-weight:900;
+      font-size:12px;
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+    }
+
+    /* Dashboard */
+    .dashGrid{display:grid; grid-template-columns: 1fr 1fr; gap:14px; margin-top:10px;}
+    @media (max-width: 980px){ .dashGrid{grid-template-columns:1fr} }
+    .statGrid{display:grid; grid-template-columns: repeat(4,1fr); gap:10px; margin-top:12px;}
+    @media (max-width: 980px){ .statGrid{grid-template-columns: repeat(2,1fr);} }
+    .stat{background: linear-gradient(180deg, rgba(15,23,48,.95), rgba(11,16,32,.85)); border:1px solid var(--line); border-radius: var(--radius2); padding:12px;}
+    .stat .k{color:var(--muted2); font-size:12px; font-weight:900}
+    .stat .v{font-size:22px; font-weight:950; margin-top:6px}
+    .legend{display:grid; gap:8px; margin-top:12px;}
+    .legendItem{display:flex; align-items:center; justify-content:space-between; gap:12px; padding:10px; border-radius:14px; border:1px solid rgba(34,48,91,.85); background: rgba(10,14,28,.55);}
+    .dot{width:10px; height:10px; border-radius:999px; background: var(--accent);}
+    .legendLeft{display:flex; align-items:center; gap:10px;}
+    .legendName{font-weight:900; font-size:13px}
+    .legendCount{font-family:var(--mono); font-size:12px; color: var(--muted);}
+
+    /* My list cards */
+    .companyList{display:grid; gap:12px; margin-top:12px;}
+    .companyCard{border:1px solid rgba(34,48,91,.85); background: rgba(10,14,28,.55); border-radius: 18px; overflow:hidden;}
+    .companyHead{padding:12px 12px; display:flex; align-items:flex-start; justify-content:space-between; gap:12px; background: rgba(17,26,51,.55); border-bottom:1px solid rgba(34,48,91,.7);}
+    .companyHead .title{font-weight:950}
+    .companyHead .subtitle{color:var(--muted2); font-size:12px; margin-top:4px; line-height:1.35}
+    .companyHead .meta{display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end}
+    .companyBody{padding:12px 12px; display:none;}
+    .companyCard.open .companyBody{display:block}
+    .miniBtn{padding:8px 10px; font-size:12px; border-radius:12px;}
+    .jobTable table{min-width: 980px;}
+
+    /* Modal */
+    .modal{position:fixed; inset:0; background: rgba(0,0,0,.55); display:none; align-items:center; justify-content:center; padding:18px; z-index: 90;}
+    .modal.open{display:flex}
+    .modalCard{width:min(980px, 100%); background: linear-gradient(180deg, rgba(17,26,51,.98), rgba(10,14,28,.95)); border:1px solid var(--line); border-radius: 22px; box-shadow: 0 18px 60px rgba(0,0,0,.55); overflow:hidden;}
+    .modalHead{padding:14px 16px; border-bottom:1px solid rgba(34,48,91,.75); display:flex; align-items:center; justify-content:space-between; gap:10px;}
+    .modalHead .t{font-weight:950}
+    .modalBody{padding:14px 16px}
+    .formGrid{display:grid; grid-template-columns: 1fr 1fr; gap:12px;}
+    .formGrid .full{grid-column: 1 / -1;}
+    @media (max-width: 760px){ .formGrid{grid-template-columns:1fr} }
+
+    .jdList{display:grid; grid-template-columns: 1fr; gap:10px; margin-top:10px;}
+    .jdItem{border:1px solid rgba(34,48,91,.85); background: rgba(10,14,28,.55); border-radius: 16px; padding:12px;}
+    .jdTop{display:flex; align-items:flex-start; justify-content:space-between; gap:10px;}
+    .jdTitle{font-weight:950; letter-spacing:.2px}
+    .jdMeta{color:var(--muted); font-size:12px; margin-top:6px; line-height:1.35}
+    .jdActions{display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;}
+    .tag{display:inline-flex; padding:4px 8px; border-radius:999px; background: rgba(61,220,151,.10); border:1px solid rgba(61,220,151,.22); font-size:12px; margin-right:6px; margin-top:6px;}
+    .tag.gray{background: rgba(233,236,255,.08); border-color: rgba(233,236,255,.16); color: rgba(233,236,255,.8);}
+
+    .toast{position: fixed; right: 16px; bottom: 16px; background: rgba(17,26,51,.95); border:1px solid rgba(34,48,91,.9);
+      color: var(--text); padding:10px 12px; border-radius: 14px; box-shadow: 0 10px 28px rgba(0,0,0,.35);
+      display:none; z-index: 120; max-width: 420px; font-size:13px;}
+    .toast.show{display:block}
+    .kbd{font-family: var(--mono); padding: 1px 6px; border-radius: 8px; background: rgba(233,236,255,.08); border:1px solid rgba(233,236,255,.12); font-size: 12px; margin:0 2px;}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <h1>求职公司库 · 投递看板 · JD 收集板</h1>
+        <div class="sub">
+          新版：<strong>公司库（榜单）</strong>扩充公司池，<strong>投递看板</strong>按“岗位”追踪进度（扇形图可视化），<strong>JD 收集</strong>用于对照学习。<br/>
+          <span class="pill">数据只保存在你浏览器本地（LocalStorage）</span>
+          <span class="pill warn">跨设备同步：导出/导入 JSON</span>
+        </div>
+      </div>
+      <div class="toolbar">
+        <button class="secondary" id="btnExport">导出 JSON</button>
+        <button class="secondary" id="btnImport">导入 JSON</button>
+        <button class="secondary" id="btnAddCustomCompany">新增自定义公司</button>
+        <button class="secondary" id="btnAddJD">新增 JD</button>
+        <button class="danger" id="btnReset">重置全部数据</button>
+      </div>
+    </header>
+
+    <div class="layout">
+      <div class="card side">
+        <div class="navTitle">页面</div>
+        <div class="tabs">
+          <div class="tab active" id="tabLibrary">公司库</div>
+          <div class="tab" id="tabBoard">投递看板</div>
+          <div class="tab" id="tabJD">JD收集</div>
+        </div>
+
+        <div id="sideLibrary">
+          <div class="navTitle">榜单板块</div>
+          <div class="boardList" id="boardList"></div>
+          <div class="small" style="margin-top:10px; line-height:1.45;">
+            快捷键：<span class="kbd">/</span> 搜索；<span class="kbd">Esc</span> 关闭弹窗。
+          </div>
+        </div>
+
+        <div id="sideBoard" style="display:none;">
+          <div class="navTitle">看板概览</div>
+          <div id="sideBoardStats" class="muted">—</div>
+          <div class="small" style="margin-top:10px; line-height:1.45;">
+            看板统计按<strong>岗位</strong>计算：同一家公司可以跟踪多个岗位。
+          </div>
+        </div>
+
+        <div id="sideJD" style="display:none;">
+          <div class="navTitle">JD 搜索</div>
+          <label style="margin-top:8px;">关键词</label>
+          <input type="text" id="jdSearch" placeholder="标题/公司/标签/正文…" />
+          <label style="margin-top:10px;">优先级</label>
+          <select id="jdPriority">
+            <option value="all">全部</option>
+            <option value="5">★★★★★</option>
+            <option value="4">★★★★</option>
+            <option value="3">★★★</option>
+            <option value="2">★★</option>
+            <option value="1">★</option>
+          </select>
+          <div class="small" style="margin-top:10px; line-height:1.45;">
+            JD 建议：粘贴全文 → 打标签（技能/工具/业务域）→ 反向更新简历/作品集。
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <!-- View: Library -->
+        <div id="viewLibrary">
+          <div class="sectionTitle">
+            <div>
+              <h2 id="boardTitle">—</h2>
+              <div class="muted" id="boardDesc">—</div>
+              <div class="small" id="boardSource"></div>
+            </div>
+            <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end;">
+              <span class="badge" id="selectedBadge"><strong>0</strong> 已选公司</span>
+              <span class="badge" id="filteredBadge"><strong>0</strong> 条结果</span>
+            </div>
+          </div>
+
+          <div class="fields">
+            <div>
+              <label>搜索（中文/英文/国家/标签）</label>
+              <input type="text" id="libSearch" placeholder="例如：腾讯 / Alibaba / Japan / 快消 / 央企 …"/>
+            </div>
+            <div>
+              <label>标签筛选</label>
+              <select id="tagFilter"><option value="all">全部标签</option></select>
+            </div>
+            <div>
+              <label>加入看板时：默认岗位状态</label>
+              <select id="defaultStatus">
+                <option value="未开始" selected>未开始</option>
+                <option value="已网申">已网申</option>
+                <option value="笔试/测评">笔试/测评</option>
+                <option value="一面">一面</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="actionsRow">
+            <div class="leftActions">
+              <button class="secondary" id="btnSelectAll">全选（当前筛选）</button>
+              <button class="secondary" id="btnClearSelect">清空已选</button>
+            </div>
+            <div class="rightActions">
+              <button id="btnAddSelectedToBoard">把已选加入“投递看板”</button>
+              <button class="secondary" id="btnAddAllFiltered">一键加入（当前筛选全部）</button>
+            </div>
+          </div>
+
+          <div class="tableWrap">
+            <table>
+              <thead>
+                <tr>
+                  <th style="width:44px;">✓</th>
+                  <th data-sort="rank" style="width:80px;">排名 ▲</th>
+                  <th data-sort="cnName" style="min-width:240px;">公司（中文/英文）</th>
+                  <th data-sort="country" style="width:160px;">国家/地区</th>
+                  <th style="width:260px;">标签</th>
+                  <th style="width:240px;">招聘入口</th>
+                </tr>
+              </thead>
+              <tbody id="libBody"></tbody>
+            </table>
+          </div>
+
+          <div class="small" style="margin-top:10px; line-height:1.5;">
+            说明：加入看板后，你可以在公司下新增多个岗位（岗位名称/地点/薪资/进度都按岗位细分）。
+          </div>
+        </div>
+
+        <!-- View: Board -->
+        <div id="viewBoard" style="display:none;">
+          <div class="sectionTitle">
+            <div>
+              <h2>求职投递看板（岗位级追踪）</h2>
+              <div class="muted">统计的是“岗位”，不是“公司”。同一公司可追踪多个岗位投递进度。</div>
+            </div>
+            <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end;">
+              <span class="badge" id="boardUpdated"><strong>—</strong> 最近保存</span>
+              <button class="secondary miniBtn" id="btnCollapseAll">全部收起</button>
+              <button class="secondary miniBtn" id="btnExpandAll">全部展开</button>
+            </div>
+          </div>
+
+          <div class="dashGrid">
+            <div class="card" style="padding:14px; border-radius:18px;">
+              <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+                <div>
+                  <div class="small">进度分布（扇形图）</div>
+                  <div style="font-weight:950; margin-top:6px;">岗位进度一眼看清</div>
+                </div>
+                <div class="badge" id="jobTotalBadge"><strong>0</strong> 个岗位</div>
+              </div>
+              <div style="display:grid; grid-template-columns: 180px 180px 1fr; gap:14px; align-items:center; margin-top:12px;">
+                <div style="display:flex; flex-direction:column; align-items:center; gap:8px;">
+                  <div class="small">岗位进度</div>
+                  <svg id="donutJobs" width="160" height="160" viewBox="0 0 42 42"></svg>
+                </div>
+                <div style="display:flex; flex-direction:column; align-items:center; gap:8px;">
+                  <div class="small">公司进度</div>
+                  <svg id="donutCompanies" width="160" height="160" viewBox="0 0 42 42"></svg>
+                </div>
+                <div>
+                  <div class="statGrid" id="boardStats"></div>
+                  <div class="legend" id="legend"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card" style="padding:14px; border-radius:18px;">
+              <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+                <div>
+                  <div class="small">你今天应该推进什么？</div>
+                  <div style="font-weight:950; margin-top:6px;">下一步日期清单</div>
+                </div>
+                <button class="secondary miniBtn" id="btnSortNext">按日期排序公司</button>
+              </div>
+              <div id="nextList" class="legend" style="margin-top:12px;"></div>
+              <div class="small" style="margin-top:10px; line-height:1.5;">
+                小技巧：只给最重要的 10–20 个岗位设置“下一步日期”，每天只推进这部分。
+              </div>
+            </div>
+          </div>
+
+          <div class="sectionTitle" style="margin-top:14px;">
+            <div>
+              <h2>公司 → 岗位子清单</h2>
+              <div class="muted">每个公司下面是岗位子清单：岗位名称 / 地点 / 薪资 / 状态 / 下一步日期 / 备注。</div>
+            </div>
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+              <input type="text" id="mySearch" placeholder="搜索（公司/岗位/地点/备注）…" style="min-width:280px;"/>
+              <select id="myStatusFilter" style="width:auto; min-width:180px;"></select>
+            </div>
+          </div>
+
+          <div class="companyList" id="companyList"></div>
+        </div>
+
+        <!-- View: JD -->
+        <div id="viewJD" style="display:none;">
+          <div class="sectionTitle">
+            <div>
+              <h2>JD 收集板（对照学习）</h2>
+              <div class="muted">把你喜欢的岗位 JD 粘贴进来：按关键词/标签/优先级快速对照。</div>
+            </div>
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+              <button id="btnAddJD2">新增 JD</button>
+            </div>
+          </div>
+          <div class="jdList" id="jdList"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Custom Company -->
+  <div class="modal" id="modalCustomCompany">
+    <div class="modalCard">
+      <div class="modalHead">
+        <div class="t">新增自定义公司（会加入到“投递看板”）</div>
+        <button class="secondary" id="closeCustomCompany">关闭</button>
+      </div>
+      <div class="modalBody">
+        <div class="formGrid">
+          <div>
+            <label>公司中文名</label>
+            <input type="text" id="ccCn" placeholder="例如：某 AI 独角兽 / 某外企…"/>
+          </div>
+          <div>
+            <label>公司英文名（可选）</label>
+            <input type="text" id="ccEn" placeholder="English name (optional)"/>
+          </div>
+          <div>
+            <label>国家/地区（可选）</label>
+            <input type="text" id="ccCountry" placeholder="例如：中国 / 美国 / 日本 / 全球…"/>
+          </div>
+          <div>
+            <label>标签（逗号分隔）</label>
+            <input type="text" id="ccTags" placeholder="出海,AI,外企,快消,活动,BD"/>
+          </div>
+          <div class="full">
+            <label>招聘链接（可选）</label>
+            <input type="url" id="ccLink" placeholder="https://..."/>
+          </div>
+        </div>
+        <div style="margin-top:12px; display:flex; gap:10px; justify-content:flex-end; flex-wrap:wrap;">
+          <button class="secondary" id="btnCCClear">清空</button>
+          <button id="btnCCSave">添加到看板</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Add JD -->
+  <div class="modal" id="modalJD">
+    <div class="modalCard">
+      <div class="modalHead">
+        <div class="t">新增 JD</div>
+        <button class="secondary" id="closeJD">关闭</button>
+      </div>
+      <div class="modalBody">
+        <div class="formGrid">
+          <div>
+            <label>公司</label>
+            <select id="jdCompany"></select>
+          </div>
+          <div>
+            <label>岗位标题</label>
+            <input type="text" id="jdTitle" placeholder="例如：海外运营 / AI 产品经理 / BD / 活动策划…"/>
+          </div>
+          <div class="full">
+            <label>JD 链接（可选）</label>
+            <input type="url" id="jdUrl" placeholder="https://..."/>
+          </div>
+          <div class="full">
+            <label>JD 正文（建议粘贴）</label>
+            <textarea id="jdText" placeholder="把 JD 内容粘贴在这里。之后用搜索快速对照、提炼关键词、拆能力要求。"></textarea>
+          </div>
+          <div>
+            <label>标签（逗号分隔，可选）</label>
+            <input type="text" id="jdTags" placeholder="出海,AI,运营,数据,增长,活动"/>
+          </div>
+          <div>
+            <label>优先级（1-5）</label>
+            <select id="jdPrio">
+              <option value="5">★★★★★（最想要）</option>
+              <option value="4">★★★★</option>
+              <option value="3" selected>★★★</option>
+              <option value="2">★★</option>
+              <option value="1">★</option>
+            </select>
+          </div>
+        </div>
+        <div style="margin-top:12px; display:flex; gap:10px; justify-content:flex-end; flex-wrap:wrap;">
+          <button class="secondary" id="btnJDClear">清空表单</button>
+          <button id="btnJDSave">保存 JD</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+<script>
+(() => {
+  const BOARDS = [{"id": "cn_internet_major", "name": "中国互联网企业（精选）", "description": "优先放在第一个：按“常见大厂重要性”排序（可当作你的主战场公司池）。", "sourceLabel": "Curated", "sourceUrl": "", "items": [{"rank": 1, "name": "Tencent", "cnName": "腾讯", "country": "China", "tags": ["互联网", "社交/游戏", "大厂"], "link": "https://careers.tencent.com/", "campus": "https://join.qq.com/"}, {"rank": 2, "name": "Alibaba Group", "cnName": "阿里巴巴", "country": "China", "tags": ["互联网", "电商/云", "大厂"], "link": "https://talent.alibaba.com/", "campus": "https://talent-holding.alibaba.com/campus/home?lang=zh"}, {"rank": 3, "name": "ByteDance / TikTok", "cnName": "字节跳动", "country": "China", "tags": ["互联网", "内容/全球化", "大厂"], "link": "https://joinbytedance.com/", "campus": "https://jobs.bytedance.com/campus"}, {"rank": 4, "name": "Meituan", "cnName": "美团", "country": "China", "tags": ["本地生活", "互联网", "大厂"], "link": "https://zhaopin.meituan.com/", "campus": "https://zhaopin.meituan.com/web/campus"}, {"rank": 5, "name": "JD.com", "cnName": "京东", "country": "China", "tags": ["电商", "供应链", "大厂"], "link": "https://zhaopin.jd.com/", "campus": "https://zhaopin.jd.com/"}, {"rank": 6, "name": "PDD Holdings (Pinduoduo/Temu)", "cnName": "拼多多（PDD/Temu）", "country": "China", "tags": ["电商", "出海", "大厂"], "link": "https://careers.pddglobalhr.com/", "campus": "https://careers.pddglobalhr.com/campus/grad"}, {"rank": 7, "name": "Baidu", "cnName": "百度", "country": "China", "tags": ["搜索/AI", "互联网", "大厂"], "link": "https://talent.baidu.com/", "campus": "https://talent.baidu.com/jobs/campus"}, {"rank": 8, "name": "NetEase", "cnName": "网易", "country": "China", "tags": ["游戏/内容", "互联网"], "link": "https://campus.163.com/", "campus": "https://campus.163.com/"}, {"rank": 9, "name": "Xiaomi", "cnName": "小米", "country": "China", "tags": ["硬件/IoT", "互联网"], "link": "https://hr.xiaomi.com/", "campus": "https://hr.xiaomi.com/campus"}, {"rank": 10, "name": "Kuaishou", "cnName": "快手", "country": "China", "tags": ["短视频", "互联网"], "link": "https://zhaopin.kuaishou.cn/", "campus": "https://zhaopin.kuaishou.cn/"}, {"rank": 11, "name": "Bilibili", "cnName": "哔哩哔哩", "country": "China", "tags": ["社区/内容", "互联网"], "link": "https://jobs.bilibili.com/", "campus": "https://jobs.bilibili.com/campus/"}, {"rank": 12, "name": "Didi", "cnName": "滴滴", "country": "China", "tags": ["出行", "互联网"], "link": "https://talent.didiglobal.com/", "campus": "https://talent.didiglobal.com/campus"}, {"rank": 13, "name": "Xiaohongshu", "cnName": "小红书", "country": "China", "tags": ["内容/电商", "互联网"], "link": "https://job.xiaohongshu.com/", "campus": "https://job.xiaohongshu.com/campus/position"}, {"rank": 14, "name": "Trip.com Group", "cnName": "携程集团", "country": "China", "tags": ["旅游", "互联网/外企气质"], "link": "https://job.ctrip.com/", "campus": "https://job.ctrip.com/"}, {"rank": 15, "name": "Weibo", "cnName": "微博", "country": "China", "tags": ["社交", "互联网"], "link": "https://weibo.zhiye.com/", "campus": "https://weibo.zhiye.com/campus"}], "defaultSort": "rank"}, {"id": "cn_key_industries", "name": "中国重点行业公司（少而精）", "description": "央企/硬科技/新能源/金融（不放太多，够你扩展行业面）。", "sourceLabel": "Curated", "sourceUrl": "", "items": [{"rank": 1, "name": "Huawei", "cnName": "华为", "country": "China", "tags": ["通信/ICT", "硬件"], "link": "https://career.huawei.com/", "campus": "https://career.huawei.com/reccampportal/portal5/campus-recruitment.html"}, {"rank": 2, "name": "State Grid Corporation of China", "cnName": "国家电网", "country": "China", "tags": ["能源/电力", "央企"], "link": "https://zhaopin.sgcc.com.cn/sgcchr/static/home.html", "campus": "https://zhaopin.sgcc.com.cn/sgcchr/static/home.html"}, {"rank": 3, "name": "Sinopec Group", "cnName": "中国石化", "country": "China", "tags": ["能源/化工", "央企"], "link": "https://job.sinopec.com/", "campus": "https://job.sinopec.com/"}, {"rank": 4, "name": "CNPC (PetroChina Group)", "cnName": "中国石油", "country": "China", "tags": ["能源", "央企"], "link": "https://zhaopin.cnpc.com.cn/", "campus": "https://zhaopin.cnpc.com.cn/"}, {"rank": 5, "name": "CATL", "cnName": "宁德时代", "country": "China", "tags": ["新能源", "电池"], "link": "https://talent.catl.com/", "campus": "https://talent.catl.com/"}, {"rank": 6, "name": "BYD", "cnName": "比亚迪", "country": "China", "tags": ["新能源车", "制造"], "link": "https://job.byd.com/portal/pc/", "campus": "https://job.byd.com/portal/mobile/school-home"}, {"rank": 7, "name": "China Mobile", "cnName": "中国移动", "country": "China", "tags": ["通信运营商", "央企"], "link": "https://job.10086.cn/", "campus": "https://job.10086.cn/touch/personal/campus/"}, {"rank": 8, "name": "ICBC", "cnName": "中国工商银行", "country": "China", "tags": ["银行", "金融"], "link": "https://job.icbc.com.cn/", "campus": "https://job.icbc.com.cn/"}, {"rank": 9, "name": "CNOOC", "cnName": "中国海油", "country": "China", "tags": ["能源", "央企"], "link": "https://cnooc.zhaopin.com/", "campus": "https://cnooc.zhaopin.com/"}, {"rank": 10, "name": "China Merchants Bank", "cnName": "招商银行", "country": "China", "tags": ["银行", "金融"], "link": "https://career.cmbchina.com/", "campus": "https://career.cmbchina.com/"}], "defaultSort": "rank"}, {"id": "fortune_g500_2025_highlights", "name": "Fortune Global 500 2025 · Top10 + Tech Highlights", "description": "按营收排名（2025榜单，反映2024财年表现）——用于快速锁定“500强/科技互联网大厂”候选。", "sourceLabel": "Fortune Global 500 (2025)", "sourceUrl": "https://fortunemedia.mediaroom.com/2025-07-29-Fortune-Announces-2025-Fortune-Global-500-List?pagetemplate=widgetpopup", "items": [{"rank": 1, "name": "Walmart", "cnName": "沃尔玛", "country": "USA", "tags": ["零售", "全球500强"], "link": "", "campus": ""}, {"rank": 2, "name": "Amazon", "cnName": "亚马逊", "country": "USA", "tags": ["电商", "云/科技", "全球500强"], "link": "", "campus": ""}, {"rank": 3, "name": "State Grid", "cnName": "国家电网", "country": "China", "tags": ["能源/公用事业", "全球500强"], "link": "", "campus": ""}, {"rank": 4, "name": "Saudi Aramco", "cnName": "沙特阿美", "country": "Saudi Arabia", "tags": ["能源", "全球500强"], "link": "", "campus": ""}, {"rank": 5, "name": "China National Petroleum", "cnName": "中国石油天然气集团", "country": "China", "tags": ["能源", "全球500强"], "link": "", "campus": ""}, {"rank": 6, "name": "Sinopec Group", "cnName": "中国石化", "country": "China", "tags": ["能源", "全球500强"], "link": "", "campus": ""}, {"rank": 7, "name": "UnitedHealth Group", "cnName": "联合健康集团", "country": "USA", "tags": ["医疗/保险", "全球500强"], "link": "", "campus": ""}, {"rank": 8, "name": "Apple", "cnName": "苹果", "country": "USA", "tags": ["科技/硬件", "全球500强"], "link": "", "campus": ""}, {"rank": 9, "name": "CVS Health", "cnName": "CVS健康", "country": "USA", "tags": ["医疗/零售", "全球500强"], "link": "", "campus": ""}, {"rank": 10, "name": "Berkshire Hathaway", "cnName": "伯克希尔·哈撒韦", "country": "USA", "tags": ["投资/综合", "全球500强"], "link": "", "campus": ""}, {"rank": 13, "name": "Alphabet", "cnName": "字母表公司（谷歌母公司）", "country": "USA", "tags": ["互联网", "广告/云", "全球500强"], "link": "", "campus": ""}, {"rank": 22, "name": "Microsoft", "cnName": "微软", "country": "USA", "tags": ["软件/云", "AI", "全球500强"], "link": "", "campus": ""}, {"rank": 41, "name": "Meta Platforms", "cnName": "Meta（脸书母公司）", "country": "USA", "tags": ["互联网", "社交/广告", "全球500强"], "link": "", "campus": ""}, {"rank": 66, "name": "Nvidia", "cnName": "英伟达", "country": "USA", "tags": ["半导体", "AI", "全球500强"], "link": "", "campus": ""}, {"rank": 91, "name": "BYD", "cnName": "比亚迪", "country": "China", "tags": ["新能源车", "制造", "全球500强"], "link": "", "campus": ""}, {"rank": 106, "name": "Tesla", "cnName": "特斯拉", "country": "USA", "tags": ["新能源车", "AI/自动驾驶", "全球500强"], "link": "", "campus": ""}], "defaultSort": "rank"}, {"id": "nrf_top50_global_retailers_2024", "name": "Top 50 Global Retailers 2024 · NRF × Kantar", "description": "全球化零售Top50（NRF × Kantar）", "sourceLabel": "NRF Top 50 Global Retailers 2024", "sourceUrl": "https://nrf.com/research-insights/top-retailers/top-50-global-retailers/top-50-global-retailers-2024", "items": [{"rank": 1, "name": "Walmart", "cnName": "沃尔玛", "country": "USA", "tags": ["零售", "全球零售Top50"], "link": "", "campus": ""}, {"rank": 2, "name": "Amazon.com", "cnName": "亚马逊", "country": "USA", "tags": ["零售", "全球零售Top50"], "link": "", "campus": ""}, {"rank": 3, "name": "Schwarz Group", "cnName": "施瓦茨集团（Lidl/考夫兰）", "country": "Germany", "tags": ["零售", "全球零售Top50"], "link": "", "campus": ""}, {"rank": 4, "name": "Aldi", "cnName": "阿尔迪", "country": "Germany", "tags": ["零售", "全球零售Top50"], "link": "", "campus": ""}, {"rank": 5, "name": "Costco", "cnName": "好市多", "country": "USA", "tags": ["零售", "全球零售Top50"], "link": "", "campus": ""}, {"rank": 6, "name": "Ahold Delhaize", "cnName": "阿霍德德拉泽", "country": "Netherlands", "tags": ["零售", "全球零售Top50"], "link": "", "campus": ""}, {"rank": 7, "name": "Carrefour", "cnName": "家乐福", "country": "France", "tags": ["零售", "全球零售Top50"], "link": "", "campus": ""}, {"rank": 8, "name": "Seven & I", "cnName": "7&i控股（7-11母公司）", "country": "Japan", "tags": ["零售", "全球零售Top50"], "link": "", "campus": ""}, {"rank": 9, "name": "The Home Depot", "cnName": "家得宝", "country": "USA", "tags": ["零售", "全球零售Top50"], "link": "", "campus": ""}, {"rank": 10, "name": "IKEA", "cnName": "宜家", "country": "Netherlands", "tags": ["零售", "全球零售Top50"], "link": "", "campus": ""}, {"rank": 11, "name": "Walgreens Boots Alliance", "cnName": "沃博联（WBA）", "country": "USA", "tags": ["零售", "全球零售Top50"], "link": "", "campus": ""}, {"rank": 12, "name": "Rewe", "cnName": "瑞威集团（REWE）", "country": "Germany", "tags": ["零售", "全球零售Top50"], "link": "", "campus": ""}, {"rank": 13, "name": "Apple", "cnName": "苹果", "country": "USA", "tags": ["零售", "全球零售Top50"], "link": "", "campus": ""}, {"rank": 14, "name": "Inditex", "cnName": "印第纺集团", "country": "Spain", "tags": ["零售", "全球零售Top50"], "link": "", "campus": ""}, {"rank": 15, "name": "Casino", "cnName": "卡西诺集团", "country": "France", "tags": ["零售", "全球零售Top50"], "link": "", "campus": ""}, {"rank": 16, "name": "Alibaba", "cnName": "阿里巴巴", "country": "China", "tags": ["零售", "全球零售Top50"], "link": "", "campus": ""}, {"rank": 17, "name": "AS Watson", "cnName": "屈臣氏集团（A.S. Watson）", "country": "Hong Kong", "tags": ["零售", "全球零售Top50"], "link": "", "campus": ""}, {"rank": 18, "name": "Jeronimo Martins", "cnName": "热罗尼莫·马丁斯", "country": "Portugal", "tags": ["零售", "全球零售Top50"], "link": "", "campus": ""}, {"rank": 19, "name": "Metro AG", "cnName": "麦德龙（Metro）", "country": "Germany", "tags": ["零售", "全球零售Top50"], "link": "", "campus": ""}, {"rank": 20, "name": "Tesco", "cnName": "乐购（Tesco）", "country": "United Kingdom", "tags": ["零售", "全球零售Top50"], "link": "", "campus": ""}, {"rank": 21, "name": "H&M", "cnName": "H&M（海恩斯莫里茨）", "country": "Sweden", "tags": ["零售", "全球零售Top50"], "link": "", "campus": ""}, {"rank": 22, "name": "Aeon", "cnName": "永旺（AEON）", "country": "Japan", "tags": ["零售", "全球零售Top50"], "link": "", "campus": ""}, {"rank": 23, "name": "TJX", "cnName": "TJX公司", "country": "USA", "tags": ["零售", "全球零售Top50"], "link": "", "campus": ""}, {"rank": 24, "name": "Auchan", "cnName": "欧尚（Auchan）", "country": "France", "tags": ["零售", "全球零售Top50"], "link": "", "campus": ""}, {"rank": 25, "name": "Ceconomy", "cnName": "塞科诺米（Ceconomy）", "country": "Germany", "tags": ["零售", "全球零售Top50"], "link": "", "campus": ""}, {"rank": 26, "name": "Woolworths Limited (Aus)", "cnName": "伍尔沃斯集团（澳大利亚）", "country": "Australia", "tags": ["零售", "全球零售Top50"], "link": "", "campus": ""}, {"rank": 27, "name": "Leclerc", "cnName": "E.Leclerc（勒克莱尔）", "country": "France", "tags": ["零售", "全球零售Top50"], "link": "", "campus": ""}, {"rank": 28, "name": "Aspiag", "cnName": "Aspiag（SPAR奥地利/意大利）", "country": "Switzerland", "tags": ["零售", "全球零售Top50"], "link": "", "campus": ""}, {"rank": 29, "name": "Euronics International", "cnName": "Euronics电子零售联盟", "country": "Netherlands", "tags": ["零售", "全球零售Top50"], "link": "", "campus": ""}, {"rank": 30, "name": "Decathlon", "cnName": "迪卡侬", "country": "France", "tags": ["零售", "全球零售Top50"], "link": "", "campus": ""}, {"rank": 31, "name": "Adeo Group", "cnName": "ADEO集团（Leroy Merlin母公司）", "country": "France", "tags": ["零售", "全球零售Top50"], "link": "", "campus": ""}, {"rank": 32, "name": "Fast Retailing", "cnName": "迅销集团（优衣库母公司）", "country": "Japan", "tags": ["零售", "全球零售Top50"], "link": "", "campus": ""}, {"rank": 33, "name": "Sephora (LVMH)", "cnName": "丝芙兰（LVMH）", "country": "France", "tags": ["零售", "全球零售Top50"], "link": "", "campus": ""}, {"rank": 34, "name": "Best Buy", "cnName": "百思买", "country": "USA", "tags": ["零售", "全球零售Top50"], "link": "", "campus": ""}, {"rank": 35, "name": "Intermarche", "cnName": "Intermarché（法国连锁超市）", "country": "France", "tags": ["零售", "全球零售Top50"], "link": "", "campus": ""}, {"rank": 36, "name": "Couche-Tard", "cnName": "阿里曼德·库什塔德（Circle K母公司）", "country": "Canada", "tags": ["零售", "全球零售Top50"], "link": "", "campus": ""}, {"rank": 37, "name": "Landmark Group", "cnName": "Landmark集团（中东零售）", "country": "United Arab Emirates", "tags": ["零售", "全球零售Top50"], "link": "", "campus": ""}, {"rank": 38, "name": "Coop Schweiz", "cnName": "瑞士Coop", "country": "Switzerland", "tags": ["零售", "全球零售Top50"], "link": "", "campus": ""}, {"rank": 39, "name": "Kingfisher", "cnName": "翠丰集团（Kingfisher）", "country": "United Kingdom", "tags": ["零售", "全球零售Top50"], "link": "", "campus": ""}, {"rank": 40, "name": "Cencosud", "cnName": "森科苏德（Cencosud）", "country": "Chile", "tags": ["零售", "全球零售Top50"], "link": "", "campus": ""}, {"rank": 41, "name": "FamilyMart", "cnName": "全家便利店", "country": "Japan", "tags": ["零售", "全球零售Top50"], "link": "", "campus": ""}, {"rank": 42, "name": "CP All", "cnName": "CP ALL（泰国7-11运营）", "country": "Thailand", "tags": ["零售", "全球零售Top50"], "link": "", "campus": ""}, {"rank": 43, "name": "Falabella", "cnName": "法拉贝拉（Falabella）", "country": "Chile", "tags": ["零售", "全球零售Top50"], "link": "", "campus": ""}, {"rank": 44, "name": "Action", "cnName": "Action折扣连锁", "country": "Netherlands", "tags": ["零售", "全球零售Top50"], "link": "", "campus": ""}, {"rank": 45, "name": "Expert", "cnName": "Expert零售联盟", "country": "Switzerland", "tags": ["零售", "全球零售Top50"], "link": "", "campus": ""}, {"rank": 46, "name": "Zalando", "cnName": "扎兰多（Zalando）", "country": "Germany", "tags": ["零售", "全球零售Top50"], "link": "", "campus": ""}, {"rank": 47, "name": "Ace Hardware", "cnName": "Ace五金（Ace Hardware）", "country": "USA", "tags": ["零售", "全球零售Top50"], "link": "", "campus": ""}, {"rank": 48, "name": "Hudson's Bay", "cnName": "哈德逊湾公司", "country": "Canada", "tags": ["零售", "全球零售Top50"], "link": "", "campus": ""}, {"rank": 49, "name": "dm drogerie markt", "cnName": "dm日化连锁", "country": "Germany", "tags": ["零售", "全球零售Top50"], "link": "", "campus": ""}, {"rank": 50, "name": "Lawson", "cnName": "罗森（LawSON）", "country": "Japan", "tags": ["零售", "全球零售Top50"], "link": "", "campus": ""}], "defaultSort": "rank"}, {"id": "consumer_goods_revenue", "name": "Top 消费品/快消（公开公司）· 按营收（示例榜单）", "description": "公开上市消费品公司按营收排序（用于扩充快消公司池）。", "sourceLabel": "CompaniesMarketCap (reference)", "sourceUrl": "https://companiesmarketcap.com/gbp/consumer-goods/largest-consumer-goods-companies-by-revenue/", "items": [{"rank": 1, "name": "Procter & Gamble", "cnName": "宝洁", "country": "USA", "tags": ["快消/消费品", "按营收（公开公司）"], "link": "", "campus": ""}, {"rank": 2, "name": "Unilever", "cnName": "联合利华", "country": "UK", "tags": ["快消/消费品", "按营收（公开公司）"], "link": "", "campus": ""}, {"rank": 3, "name": "L'Oréal", "cnName": "欧莱雅", "country": "France", "tags": ["快消/消费品", "按营收（公开公司）"], "link": "", "campus": ""}, {"rank": 4, "name": "Henkel", "cnName": "汉高", "country": "Germany", "tags": ["快消/消费品", "按营收（公开公司）"], "link": "", "campus": ""}, {"rank": 5, "name": "Colgate-Palmolive", "cnName": "高露洁-棕榄", "country": "USA", "tags": ["快消/消费品", "按营收（公开公司）"], "link": "", "campus": ""}, {"rank": 6, "name": "Kimberly-Clark", "cnName": "金佰利", "country": "USA", "tags": ["快消/消费品", "按营收（公开公司）"], "link": "", "campus": ""}, {"rank": 7, "name": "Kenvue", "cnName": "科赴（Kenvue）", "country": "USA", "tags": ["快消/消费品", "按营收（公开公司）"], "link": "", "campus": ""}, {"rank": 8, "name": "Reckitt Benckiser", "cnName": "利洁时（Reckitt）", "country": "UK", "tags": ["快消/消费品", "按营收（公开公司）"], "link": "", "campus": ""}, {"rank": 9, "name": "Estée Lauder", "cnName": "雅诗兰黛", "country": "USA", "tags": ["快消/消费品", "按营收（公开公司）"], "link": "", "campus": ""}, {"rank": 10, "name": "Haleon", "cnName": "赫力昂（Haleon）", "country": "UK", "tags": ["快消/消费品", "按营收（公开公司）"], "link": "", "campus": ""}, {"rank": 11, "name": "Kao", "cnName": "花王", "country": "Japan", "tags": ["快消/消费品", "按营收（公开公司）"], "link": "", "campus": ""}, {"rank": 12, "name": "Hindustan Unilever", "cnName": "印度斯坦联合利华", "country": "India", "tags": ["快消/消费品", "按营收（公开公司）"], "link": "", "campus": ""}, {"rank": 13, "name": "Beiersdorf", "cnName": "拜尔斯道夫（妮维雅母公司）", "country": "Germany", "tags": ["快消/消费品", "按营收（公开公司）"], "link": "", "campus": ""}, {"rank": 14, "name": "Newell Brands", "cnName": "纽威品牌（Newell）", "country": "USA", "tags": ["快消/消费品", "按营收（公开公司）"], "link": "", "campus": ""}, {"rank": 15, "name": "Orkla", "cnName": "奥克拉（Orkla）", "country": "Norway", "tags": ["快消/消费品", "按营收（公开公司）"], "link": "", "campus": ""}, {"rank": 16, "name": "Clorox", "cnName": "高乐氏（Clorox）", "country": "USA", "tags": ["快消/消费品", "按营收（公开公司）"], "link": "", "campus": ""}, {"rank": 17, "name": "Shiseido", "cnName": "资生堂", "country": "Japan", "tags": ["快消/消费品", "按营收（公开公司）"], "link": "", "campus": ""}, {"rank": 18, "name": "Unicharm", "cnName": "尤妮佳", "country": "Japan", "tags": ["快消/消费品", "按营收（公开公司）"], "link": "", "campus": ""}, {"rank": 19, "name": "Church & Dwight", "cnName": "丘奇&德怀特", "country": "USA", "tags": ["快消/消费品", "按营收（公开公司）"], "link": "", "campus": ""}, {"rank": 20, "name": "Coty", "cnName": "科蒂（Coty）", "country": "USA", "tags": ["快消/消费品", "按营收（公开公司）"], "link": "", "campus": ""}, {"rank": 21, "name": "LG Household & Health Care", "cnName": "LG生活健康", "country": "South Korea", "tags": ["快消/消费品", "按营收（公开公司）"], "link": "", "campus": ""}, {"rank": 22, "name": "Kimberly-Clark de México", "cnName": "金佰利墨西哥", "country": "Mexico", "tags": ["快消/消费品", "按营收（公开公司）"], "link": "", "campus": ""}, {"rank": 23, "name": "Lion Corp", "cnName": "狮王（LION）", "country": "Japan", "tags": ["快消/消费品", "按营收（公开公司）"], "link": "", "campus": ""}, {"rank": 24, "name": "Tata Consumer Products", "cnName": "塔塔消费品", "country": "India", "tags": ["快消/消费品", "按营收（公开公司）"], "link": "", "campus": ""}, {"rank": 25, "name": "Unilever Indonesia", "cnName": "联合利华印尼", "country": "Indonesia", "tags": ["快消/消费品", "按营收（公开公司）"], "link": "", "campus": ""}, {"rank": 26, "name": "BIC", "cnName": "比克（BIC）", "country": "France", "tags": ["快消/消费品", "按营收（公开公司）"], "link": "", "campus": ""}, {"rank": 27, "name": "Rohto Pharmaceutical", "cnName": "乐敦制药", "country": "Japan", "tags": ["快消/消费品", "按营收（公开公司）"], "link": "", "campus": ""}, {"rank": 28, "name": "Helen of Troy", "cnName": "海伦·特洛伊", "country": "USA", "tags": ["快消/消费品", "按营收（公开公司）"], "link": "", "campus": ""}, {"rank": 29, "name": "Dabur", "cnName": "达布尔（Dabur）", "country": "India", "tags": ["快消/消费品", "按营收（公开公司）"], "link": "", "campus": ""}, {"rank": 30, "name": "Marico", "cnName": "马里科（Marico）", "country": "India", "tags": ["快消/消费品", "按营收（公开公司）"], "link": "", "campus": ""}, {"rank": 31, "name": "Fiskars", "cnName": "芬世家（Fiskars）", "country": "Finland", "tags": ["快消/消费品", "按营收（公开公司）"], "link": "", "campus": ""}, {"rank": 32, "name": "McBride", "cnName": "麦克布赖德（McBride）", "country": "UK", "tags": ["快消/消费品", "按营收（公开公司）"], "link": "", "campus": ""}, {"rank": 33, "name": "Prestige Consumer Healthcare", "cnName": "普利斯蒂奇消费健康", "country": "USA", "tags": ["快消/消费品", "按营收（公开公司）"], "link": "", "campus": ""}, {"rank": 34, "name": "Ontex Group", "cnName": "安德士（Ontex）", "country": "Belgium", "tags": ["快消/消费品", "按营收（公开公司）"], "link": "", "campus": ""}, {"rank": 35, "name": "Earth Corporation", "cnName": "大地公司（Earth）", "country": "Japan", "tags": ["快消/消费品", "按营收（公开公司）"], "link": "", "campus": ""}, {"rank": 36, "name": "TriMas", "cnName": "特里马斯（TriMas）", "country": "USA", "tags": ["快消/消费品", "按营收（公开公司）"], "link": "", "campus": ""}, {"rank": 37, "name": "Colgate-Palmolive India", "cnName": "高露洁-棕榄印度", "country": "India", "tags": ["快消/消费品", "按营收（公开公司）"], "link": "", "campus": ""}, {"rank": 38, "name": "Pigeon", "cnName": "贝亲", "country": "Japan", "tags": ["快消/消费品", "按营收（公开公司）"], "link": "", "campus": ""}, {"rank": 39, "name": "Sano Bruno's Enterprises", "cnName": "萨诺（Sano）", "country": "Israel", "tags": ["快消/消费品", "按营收（公开公司）"], "link": "", "campus": ""}, {"rank": 40, "name": "Procter & Gamble India", "cnName": "宝洁印度", "country": "India", "tags": ["快消/消费品", "按营收（公开公司）"], "link": "", "campus": ""}, {"rank": 41, "name": "Noevir Holdings", "cnName": "诺薇雅（Noevir）", "country": "Japan", "tags": ["快消/消费品", "按营收（公开公司）"], "link": "", "campus": ""}, {"rank": 42, "name": "Olaplex", "cnName": "奥拉普莱克斯（Olaplex）", "country": "USA", "tags": ["快消/消费品", "按营收（公开公司）"], "link": "", "campus": ""}, {"rank": 43, "name": "The Honest Company", "cnName": "诚实公司（Honest）", "country": "USA", "tags": ["快消/消费品", "按营收（公开公司）"], "link": "", "campus": ""}, {"rank": 44, "name": "Zydus Wellness", "cnName": "齐都斯健康（Zydus）", "country": "India", "tags": ["快消/消费品", "按营收（公开公司）"], "link": "", "campus": ""}, {"rank": 45, "name": "edding AG", "cnName": "艾丁（edding）", "country": "Germany", "tags": ["快消/消费品", "按营收（公开公司）"], "link": "", "campus": ""}, {"rank": 46, "name": "Crown Crafts", "cnName": "皇冠工艺（Crown Crafts）", "country": "USA", "tags": ["快消/消费品", "按营收（公开公司）"], "link": "", "campus": ""}, {"rank": 47, "name": "Colgate-Palmolive (Pakistan)", "cnName": "高露洁-棕榄巴基斯坦", "country": "Pakistan", "tags": ["快消/消费品", "按营收（公开公司）"], "link": "", "campus": ""}, {"rank": 48, "name": "Unilever Pakistan Foods", "cnName": "联合利华巴基斯坦食品", "country": "Pakistan", "tags": ["快消/消费品", "按营收（公开公司）"], "link": "", "campus": ""}, {"rank": 49, "name": "The National Detergent Company SAOG", "cnName": "国家洗涤剂公司（阿曼）", "country": "Oman", "tags": ["快消/消费品", "按营收（公开公司）"], "link": "", "campus": ""}], "defaultSort": "rank"}];
+  const STORAGE_KEY = "senna_job_app_v2";
+
+  const STATUSES = ["未开始","待定","已网申","笔试/测评","一面","二面","三面/终面","HR面","Offer","已拒","已放弃","不感兴趣"];
+
+  const $ = (sel) => document.querySelector(sel);
+  const el = (tag, attrs={}, children=[]) => {
+    const n = document.createElement(tag);
+    Object.entries(attrs).forEach(([k,v]) => {
+      if(k === "class") n.className = v;
+      else if(k === "html") n.innerHTML = v;
+      else if(k.startsWith("on") && typeof v === "function") n.addEventListener(k.slice(2), v);
+      else n.setAttribute(k, v);
+    });
+    children.forEach(c => n.appendChild(typeof c === "string" ? document.createTextNode(c) : c));
+    return n;
+  };
+  const nowISO = () => new Date().toISOString();
+  const uid = () => "id_" + Math.random().toString(16).slice(2) + "_" + Date.now().toString(16);
+
+  function toast(msg){
+    const t = $("#toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    clearTimeout(toast._timer);
+    toast._timer = setTimeout(() => t.classList.remove("show"), 2200);
+  }
+
+  function load(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(!raw) return null;
+      return JSON.parse(raw);
+    }catch(e){ return null; }
+  }
+  function save(){
+    state.savedAt = nowISO();
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  }
+
+  function defaultState(){
+    return {
+      version: 2,
+      savedAt: nowISO(),
+      view: "library",
+      activeBoardId: BOARDS[0]?.id || "",
+      customCompanies: {},
+      myCompanies: [],
+      companyEntries: {},
+      jdBoard: []
+    };
+  }
+
+  let state = load() || defaultState();
+
+  // --- boards helpers ---
+  function normalizeCompanyId(boardId, rank, name){
+    return `${boardId}::${rank}::${name}`;
+  }
+  function boardById(id){ return BOARDS.find(b => b.id === id) || BOARDS[0]; }
+
+  function listBoardCompanies(board){
+    return board.items.map(it => ({
+      id: normalizeCompanyId(board.id, it.rank, it.name),
+      boardId: board.id,
+      rank: it.rank,
+      name: it.name,
+      cnName: it.cnName || "（未命名）",
+      country: it.country || "",
+      tags: it.tags || [],
+      link: it.link || "",
+      campus: it.campus || "",
+      sourceLabel: board.sourceLabel || "",
+      sourceUrl: board.sourceUrl || "",
+      boardName: board.name
+    }));
+  }
+
+  function getCompanyById(companyId){
+    for(const b of BOARDS){
+      for(const it of b.items){
+        const id = normalizeCompanyId(b.id, it.rank, it.name);
+        if(id === companyId) return {
+          id,
+          boardId: b.id,
+          rank: it.rank,
+          name: it.name,
+          cnName: it.cnName || "",
+          country: it.country || "",
+          tags: it.tags || [],
+          link: it.link || "",
+          campus: it.campus || "",
+          boardName: b.name,
+          sourceLabel: b.sourceLabel || "",
+          sourceUrl: b.sourceUrl || ""
+        };
+      }
+    }
+    if(state.customCompanies[companyId]) return state.customCompanies[companyId];
+    return null;
+  }
+
+  // --- UI view switching ---
+  function setView(view){
+    state.view = view;
+    save();
+    $("#tabLibrary").classList.toggle("active", view==="library");
+    $("#tabBoard").classList.toggle("active", view==="board");
+    $("#tabJD").classList.toggle("active", view==="jd");
+
+    $("#viewLibrary").style.display = view==="library" ? "" : "none";
+    $("#viewBoard").style.display = view==="board" ? "" : "none";
+    $("#viewJD").style.display = view==="jd" ? "" : "none";
+
+    $("#sideLibrary").style.display = view==="library" ? "" : "none";
+    $("#sideBoard").style.display = view==="board" ? "" : "none";
+    $("#sideJD").style.display = view==="jd" ? "" : "none";
+
+    if(view==="library"){ selected.clear(); renderBoardList(); renderLibrary(); }
+    if(view==="board"){ renderBoard(); }
+    if(view==="jd"){ renderJDCompanySelect(); renderJD(); }
+  }
+
+  // --- Board list sidebar ---
+  function renderBoardList(){
+    const list = $("#boardList");
+    list.innerHTML = "";
+    BOARDS.forEach(b => {
+      const btn = el("div", {
+        class: "boardBtn " + (state.activeBoardId===b.id ? "active":""),
+        onclick: () => {
+          state.activeBoardId = b.id;
+          save();
+          selected.clear();
+          renderBoardList();
+          renderLibrary();
+        }
+      }, [
+        el("div", {class:"name"}, [b.name]),
+        el("div", {class:"desc"}, [b.description || ""])
+      ]);
+      list.appendChild(btn);
+    });
+  }
+
+  // --- Library selection + filtering ---
+  const selected = new Set();
+  let libSort = {key:"rank", dir:"asc"};
+  function setLibSort(key){
+    if(libSort.key === key) libSort.dir = (libSort.dir==="asc") ? "desc" : "asc";
+    else { libSort.key = key; libSort.dir = "asc"; }
+    renderLibrary();
+  }
+  function matches(text, q){
+    if(!q) return true;
+    return String(text||"").toLowerCase().includes(q.toLowerCase());
+  }
+  function refreshTagFilter(companies){
+    const tagSel = $("#tagFilter");
+    const current = tagSel.value;
+    tagSel.innerHTML = "";
+    tagSel.appendChild(el("option", {value:"all"}, ["全部标签"]));
+    const tags = new Set();
+    companies.forEach(c => (c.tags||[]).forEach(t => tags.add(t)));
+    [...tags].sort((a,b)=>a.localeCompare(b,'zh')).forEach(t => tagSel.appendChild(el("option",{value:t},[t])));
+    if([...tagSel.options].some(o=>o.value===current)) tagSel.value = current;
+  }
+
+  function renderLibrary(){
+    const board = boardById(state.activeBoardId);
+    const companies = listBoardCompanies(board);
+
+    $("#boardTitle").textContent = board.name;
+    $("#boardDesc").textContent = board.description || "";
+    $("#boardSource").innerHTML = board.sourceUrl
+      ? `数据来源：<a class="linkbtn" href="${board.sourceUrl}" target="_blank" rel="noreferrer">${board.sourceLabel}</a>`
+      : `数据来源：${board.sourceLabel || "Curated"}`;
+
+    refreshTagFilter(companies);
+
+    const q = $("#libSearch").value.trim();
+    const tag = $("#tagFilter").value;
+
+    let filtered = companies.filter(c => {
+      if(tag !== "all" && !(c.tags||[]).includes(tag)) return false;
+      const hay = [c.cnName, c.name, c.country, (c.tags||[]).join(","), c.boardName].join(" ");
+      return matches(hay, q);
+    });
+
+    filtered.sort((a,b) => {
+      const dir = libSort.dir==="asc" ? 1 : -1;
+      const k = libSort.key;
+      if(k==="rank") return dir * ((a.rank||999999) - (b.rank||999999));
+      const av = (a[k] ?? "").toString();
+      const bv = (b[k] ?? "").toString();
+      return dir * av.localeCompare(bv,'zh');
+    });
+
+    $("#filteredBadge").innerHTML = `<strong>${filtered.length}</strong> 条结果`;
+    $("#selectedBadge").innerHTML = `<strong>${selected.size}</strong> 已选公司`;
+
+    const body = $("#libBody");
+    body.innerHTML = "";
+
+    for(const c of filtered){
+      const checked = selected.has(c.id);
+      const cb = el("input", {
+        type:"checkbox",
+        ...(checked ? {checked:"checked"} : {}),
+        onchange:(e)=>{
+          if(e.target.checked) selected.add(c.id);
+          else selected.delete(c.id);
+          $("#selectedBadge").innerHTML = `<strong>${selected.size}</strong> 已选公司`;
+        }
+      });
+
+      const tags = el("div",{},[]);
+      (c.tags||[]).slice(0,6).forEach(t => tags.appendChild(el("span", {class:"chip tag"}, [t])));
+      if((c.tags||[]).length===0) tags.appendChild(el("span", {class:"small"}, ["—"]));
+
+      const links = el("div",{},[
+        c.link ? el("a",{class:"linkbtn", href:c.link, target:"_blank", rel:"noreferrer"},["招聘/官网"]) : el("span",{class:"small"},["—"]),
+        " ",
+        c.campus ? el("a",{class:"linkbtn", href:c.campus, target:"_blank", rel:"noreferrer"},["校招"]) : el("span",{class:"small"},[""])
+      ]);
+
+      const companyCell = el("div", {class:"companyCell"}, [
+        el("div",{class:"cn"},[c.cnName]),
+        el("div",{class:"en"},[c.name])
+      ]);
+
+      body.appendChild(el("tr",{},[
+        el("td",{},[cb]),
+        el("td",{},[String(c.rank ?? "—")]),
+        el("td",{},[companyCell]),
+        el("td",{},[c.country || "—"]),
+        el("td",{},[tags]),
+        el("td",{},[links]),
+      ]));
+    }
+  }
+
+  function selectAllFiltered(){
+    const board = boardById(state.activeBoardId);
+    const companies = listBoardCompanies(board);
+    const q = $("#libSearch").value.trim();
+    const tag = $("#tagFilter").value;
+
+    companies.filter(c => {
+      if(tag !== "all" && !(c.tags||[]).includes(tag)) return false;
+      const hay = [c.cnName, c.name, c.country, (c.tags||[]).join(","), c.boardName].join(" ");
+      return matches(hay, q);
+    }).forEach(c => selected.add(c.id));
+
+    $("#selectedBadge").innerHTML = `<strong>${selected.size}</strong> 已选公司`;
+    renderLibrary();
+  }
+
+  function clearSelection(){
+    selected.clear();
+    $("#selectedBadge").innerHTML = `<strong>0</strong> 已选公司`;
+    renderLibrary();
+  }
+
+  // --- Add to board (company -> job list) ---
+  function ensureCompanyEntry(companyId, preset={}){
+    const existingEntryId = state.myCompanies.find(eid => state.companyEntries[eid]?.companyId === companyId);
+    if(existingEntryId){
+      addJob(existingEntryId, preset);
+      return existingEntryId;
+    }
+    const c = getCompanyById(companyId);
+    if(!c) return null;
+
+    const entryId = uid();
+    state.companyEntries[entryId] = {
+      id: entryId,
+      companyId: c.id,
+      cnName: c.cnName || "",
+      enName: c.name || "",
+      country: c.country || "",
+      tags: c.tags || [],
+      link: c.link || "",
+      campus: c.campus || "",
+      boardName: c.boardName || "",
+      jobs: []
+    };
+    state.myCompanies.push(entryId);
+    addJob(entryId, preset);
+    return entryId;
+  }
+
+  function addJob(entryId, preset={}){
+    const jobId = uid();
+    const defaultStatus = preset.status || $("#defaultStatus")?.value || "未开始";
+    state.companyEntries[entryId].jobs.push({
+      id: jobId,
+      title: preset.title || "",
+      location: preset.location || "",
+      salary: preset.salary || "",
+      status: defaultStatus,
+      nextDate: preset.nextDate || "",
+      notes: preset.notes || "",
+      url: preset.url || ""
+    });
+    save();
+  }
+
+  function addSelectedToBoard(){
+    const status = $("#defaultStatus").value;
+    for(const cid of selected){
+      ensureCompanyEntry(cid, {status});
+    }
+    save();
+    toast("已加入到看板（重复公司会新增岗位行）");
+  }
+
+  function addAllFilteredToBoard(){
+    const board = boardById(state.activeBoardId);
+    const companies = listBoardCompanies(board);
+    const q = $("#libSearch").value.trim();
+    const tag = $("#tagFilter").value;
+    const status = $("#defaultStatus").value;
+
+    companies.filter(c => {
+      if(tag !== "all" && !(c.tags||[]).includes(tag)) return false;
+      const hay = [c.cnName, c.name, c.country, (c.tags||[]).join(","), c.boardName].join(" ");
+      return matches(hay, q);
+    }).forEach(c => ensureCompanyEntry(c.id, {status}));
+
+    save();
+    toast("已一键加入到看板（按当前筛选）");
+  }
+
+  // --- Job aggregation for dashboard ---
+  function allJobs(){
+    const jobs = [];
+    for(const eid of state.myCompanies){
+      const e = state.companyEntries[eid];
+      if(!e) continue;
+      (e.jobs||[]).forEach(j => jobs.push({entryId:eid, company:e, job:j}));
+    }
+    return jobs;
+  }
+
+  function computeJobBuckets(){
+    const buckets = {
+      "未投递/待定": 0,
+      "已网申": 0,
+      "笔试/测评": 0,
+      "面试中": 0,
+      "Offer": 0,
+      "已拒/放弃": 0
+    };
+    allJobs().forEach(({job}) => {
+      const st = job.status || "未开始";
+      if(st === "Offer") buckets["Offer"]++;
+      else if(st === "已网申") buckets["已网申"]++;
+      else if(st === "笔试/测评") buckets["笔试/测评"]++;
+      else if(["一面","二面","三面/终面","HR面"].includes(st)) buckets["面试中"]++;
+      else if(["已拒","已放弃"].includes(st)) buckets["已拒/放弃"]++;
+      else buckets["未投递/待定"]++;
+    });
+    return buckets;
+  }
+
+  function computeHeadlineStats(){
+    const jobs = allJobs();
+    const total = jobs.length;
+    let applied = 0, inProcess = 0, offer = 0, rejected = 0;
+    jobs.forEach(({job}) => {
+      const st = job.status || "未开始";
+      if(["已网申","笔试/测评","一面","二面","三面/终面","HR面","Offer"].includes(st)) applied++;
+      if(["笔试/测评","一面","二面","三面/终面","HR面"].includes(st)) inProcess++;
+      if(st === "Offer") offer++;
+      if(["已拒","已放弃"].includes(st)) rejected++;
+    });
+    return { companies: state.myCompanies.length, jobs: total, applied, inProcess, offer, rejected };
+  }
+
+  function computeCompanyBuckets(){
+    const buckets = {
+      "未投递/待定": 0,
+      "已网申": 0,
+      "笔试/测评": 0,
+      "面试中": 0,
+      "Offer": 0,
+      "已拒/放弃": 0
+    };
+    // Each company counts once, based on its highest job status
+    state.myCompanies.forEach(eid => {
+      const entry = state.companyEntries[eid];
+      if(!entry) return;
+      const st = companyOverallStatus(entry) || "未开始";
+      if(st === "Offer") buckets["Offer"]++;
+      else if(st === "已网申") buckets["已网申"]++;
+      else if(st === "笔试/测评") buckets["笔试/测评"]++;
+      else if(["一面","二面","三面/终面","HR面"].includes(st)) buckets["面试中"]++;
+      else if(["已拒","已放弃"].includes(st)) buckets["已拒/放弃"]++;
+      else buckets["未投递/待定"]++;
+    });
+    return buckets;
+  }
+
+  // Generic SVG donut renderer
+  function renderDonut(svgId, buckets, centerTop, centerBottom){
+    const total = Object.values(buckets).reduce((a,b)=>a+b,0) || 1;
+    const svg = document.getElementById(svgId);
+    if(!svg) return;
+    svg.innerHTML = "";
+
+    // base ring
+    svg.appendChild(el("circle", {
+      cx:"21", cy:"21", r:"15.915", fill:"transparent",
+      stroke:"rgba(233,236,255,.10)", "stroke-width":"6"
+    }));
+
+    const colors = ["var(--c6)","var(--c1)","var(--c3)","var(--c5)","var(--c2)","var(--c4)"];
+    const keys = Object.keys(buckets);
+    let acc = 0;
+
+    keys.forEach((k, idx) => {
+      const val = buckets[k];
+      const pct = (val/total)*100;
+      const dash = `${pct} ${100-pct}`;
+      svg.appendChild(el("circle", {
+        cx:"21", cy:"21", r:"15.915", fill:"transparent",
+        stroke: colors[idx % colors.length],
+        "stroke-width":"6",
+        "stroke-dasharray": dash,
+        "stroke-dashoffset": String(25 - acc),
+        "stroke-linecap": "butt",
+        transform:"rotate(-90 21 21)"
+      }));
+      acc += pct;
+    });
+
+    svg.appendChild(el("text", {
+      x:"21", y:"20", "text-anchor":"middle", "dominant-baseline":"middle",
+      fill:"rgba(233,236,255,.9)", style:"font-weight:950; font-size:6px;"
+    }, [centerTop || ""]));
+    svg.appendChild(el("text", {
+      x:"21", y:"26", "text-anchor":"middle", "dominant-baseline":"middle",
+      fill:"rgba(233,236,255,.75)", style:"font-family:var(--mono); font-size:6px;"
+    }, [String(centerBottom ?? "")]));
+  }
+
+  // Legend shows both job counts and company counts
+  function renderLegend(jobBuckets, companyBuckets){
+    const legend = $("#legend");
+    legend.innerHTML = "";
+    const colors = ["var(--c6)","var(--c1)","var(--c3)","var(--c5)","var(--c2)","var(--c4)"];
+    const totalJobs = Object.values(jobBuckets).reduce((a,b)=>a+b,0) || 1;
+    const totalCompanies = Object.values(companyBuckets).reduce((a,b)=>a+b,0) || 1;
+
+    const keys = Object.keys(jobBuckets);
+    keys.forEach((k, idx) => {
+      const jv = jobBuckets[k] ?? 0;
+      const cv = companyBuckets[k] ?? 0;
+      const jp = jv===0 ? "" : `岗位${Math.round((jv/totalJobs)*100)}%`;
+      const cp = cv===0 ? "" : `公司${Math.round((cv/totalCompanies)*100)}%`;
+
+      legend.appendChild(el("div", {class:"legendItem"}, [
+        el("div", {class:"legendLeft"}, [
+          el("span", {class:"dot", style:`background:${colors[idx%colors.length]}`}),
+          el("div", {}, [
+            el("div", {class:"legendName"}, [k]),
+            el("div", {class:"legendCount"}, [`岗位:${jv}  ·  公司:${cv}`])
+          ])
+        ]),
+        el("div", {class:"legendCount"}, [(jp || cp) ? `${jp}${jp && cp ? " | " : ""}${cp}` : ""])
+      ]));
+    });
+  }
+function renderStatsCards(head){
+    const box = $("#boardStats");
+    box.innerHTML = "";
+    const items = [
+      ["公司数", head.companies],
+      ["岗位总数", head.jobs],
+      ["已投递（≥网申）", head.applied],
+      ["流程中（笔试-面试）", head.inProcess],
+      ["Offer", head.offer],
+      ["已拒/放弃", head.rejected]
+    ];
+
+    const grid = el("div", {class:"statGrid"}, []);
+    items.slice(0,4).forEach(([k,v]) => grid.appendChild(el("div", {class:"stat"}, [el("div",{class:"k"},[k]), el("div",{class:"v"},[String(v)])])));
+    const grid2 = el("div", {class:"statGrid", style:"grid-template-columns: repeat(2,1fr); margin-top:10px;"}, []);
+    items.slice(4).forEach(([k,v]) => grid2.appendChild(el("div", {class:"stat"}, [el("div",{class:"k"},[k]), el("div",{class:"v"},[String(v)])])));
+    box.appendChild(grid);
+    box.appendChild(grid2);
+
+    $("#jobTotalBadge").innerHTML = `<strong>${head.jobs}</strong> 个岗位`;
+    $("#sideBoardStats").innerHTML = `公司：<b>${head.companies}</b><br/>岗位：<b>${head.jobs}</b><br/>已投递：<b>${head.applied}</b>`;
+    $("#boardUpdated").innerHTML = `<strong>${new Date(state.savedAt).toLocaleString()}</strong> 最近保存`;
+  }
+
+  function renderNextList(){
+    const list = $("#nextList");
+    list.innerHTML = "";
+    const jobs = allJobs().filter(x => x.job.nextDate).sort((a,b)=> (a.job.nextDate||"").localeCompare(b.job.nextDate||"")).slice(0, 10);
+
+    if(jobs.length===0){
+      list.appendChild(el("div", {class:"legendItem"}, [
+        el("div", {class:"legendLeft"}, [
+          el("span", {class:"dot", style:"background:rgba(233,236,255,.25)"}),
+          el("div", {}, [
+            el("div", {class:"legendName"}, ["暂无“下一步日期”"]),
+            el("div", {class:"legendCount"}, ["给最重要的岗位设置日期，会非常好用"])
+          ])
+        ]),
+        el("div", {class:"legendCount"}, [""])
+      ]));
+      return;
+    }
+
+    jobs.forEach(x => {
+      list.appendChild(el("div", {class:"legendItem"}, [
+        el("div", {class:"legendLeft"}, [
+          el("span", {class:"dot", style:"background:var(--accent)"}),
+          el("div", {}, [
+            el("div", {class:"legendName"}, [`${x.company.cnName} · ${x.job.title || "（未命名岗位）"}`]),
+            el("div", {class:"legendCount"}, [`${x.job.nextDate} · ${x.job.status || "未开始"}`])
+          ])
+        ]),
+        el("div", {class:"legendCount"}, [x.job.location || ""])
+      ]));
+    });
+  }
+
+  // --- Company cards with job sublist ---
+  function companyOverallStatus(entry){
+    const order = {"Offer":9,"HR面":8,"三面/终面":7,"二面":6,"一面":5,"笔试/测评":4,"已网申":3,"待定":2,"未开始":1,"已拒":0,"已放弃":0,"不感兴趣":0};
+    let max = -1; let best = "未开始";
+    (entry.jobs||[]).forEach(j => {
+      const v = order[j.status] ?? 1;
+      if(v > max){ max = v; best = j.status; }
+    });
+    return best;
+  }
+
+  function updateJob(entryId, jobId, patch){
+    const entry = state.companyEntries[entryId];
+    if(!entry) return;
+    const idx = entry.jobs.findIndex(j => j.id === jobId);
+    if(idx < 0) return;
+    entry.jobs[idx] = {...entry.jobs[idx], ...patch};
+    save();
+    renderBoard();
+  }
+
+  function deleteJob(entryId, jobId){
+    if(!confirm("确认删除这个岗位记录？")) return;
+    const entry = state.companyEntries[entryId];
+    if(!entry) return;
+    entry.jobs = entry.jobs.filter(j => j.id !== jobId);
+    if(entry.jobs.length === 0) addJob(entryId, {status:"未开始"});
+    save();
+    renderBoard();
+    toast("已删除岗位");
+  }
+
+  function removeCompany(entryId){
+    if(!confirm("确认从看板移除这家公司？（会删除其所有岗位记录）")) return;
+    state.myCompanies = state.myCompanies.filter(x => x !== entryId);
+    delete state.companyEntries[entryId];
+    save();
+    renderBoard();
+    toast("已移除");
+  }
+
+  function renderJobTable(entry, jobs){
+    const wrap = el("div", {class:"jobTable tableWrap"}, []);
+    const table = el("table",{},[]);
+    table.appendChild(el("thead",{},[
+      el("tr",{},[
+        el("th",{style:"width:70px;"},["序号"]),
+        el("th",{style:"min-width:220px;"},["岗位名称"]),
+        el("th",{style:"width:160px;"},["地点"]),
+        el("th",{style:"width:140px;"},["薪资"]),
+        el("th",{style:"width:150px;"},["状态"]),
+        el("th",{style:"width:150px;"},["下一步日期"]),
+        el("th",{style:"min-width:220px;"},["岗位链接"]),
+        el("th",{style:"min-width:240px;"},["备注"]),
+        el("th",{style:"width:120px;"},["操作"])
+      ])
+    ]));
+    const tbody = el("tbody",{},[]);
+    const rows = (jobs !== undefined && jobs !== null) ? jobs : (entry.jobs || []);
+    if(rows.length === 0){
+      tbody.appendChild(el("tr",{},[
+        el("td",{colspan:"9", style:"color: rgba(233,236,255,.7); padding:14px;"},["暂无符合筛选条件的岗位。可取消筛选查看全部，或点击上方‘新增岗位’添加。"]) 
+      ]));
+    }
+    rows.forEach((j, idx) => {
+      const statusSel = el("select", {onchange:(ev)=>updateJob(entry.id, j.id, {status: ev.target.value})});
+      STATUSES.forEach(s => statusSel.appendChild(el("option",{value:s},[s])));
+      statusSel.value = j.status || "未开始";
+
+      tbody.appendChild(el("tr",{},[
+        el("td",{},[String(idx+1)]),
+        el("td",{},[el("input",{type:"text", value:j.title||"", placeholder:"例如：出海运营 / AI PM / BD …", oninput:(ev)=>updateJob(entry.id, j.id, {title: ev.target.value})})]),
+        el("td",{},[el("input",{type:"text", value:j.location||"", placeholder:"北京/上海/远程…", oninput:(ev)=>updateJob(entry.id, j.id, {location: ev.target.value})})]),
+        el("td",{},[el("input",{type:"text", value:j.salary||"", placeholder:"20-25w / 25k*14 …", oninput:(ev)=>updateJob(entry.id, j.id, {salary: ev.target.value})})]),
+        el("td",{},[statusSel]),
+        el("td",{},[el("input",{type:"date", value:j.nextDate||"", onchange:(ev)=>updateJob(entry.id, j.id, {nextDate: ev.target.value})})]),
+        el("td",{},[
+          el("input",{type:"url", value:j.url||"", placeholder:"https://岗位JD链接", oninput:(ev)=>updateJob(entry.id, j.id, {url: ev.target.value})}),
+          (j.url ? el("div",{style:"margin-top:8px;"},[el("a",{class:"linkbtn", href:j.url, target:"_blank", rel:"noreferrer"},["打开"])]) : el("div"))
+        ]),
+        el("td",{},[el("input",{type:"text", value:j.notes||"", placeholder:"面试官/要点/内推码/时间…", oninput:(ev)=>updateJob(entry.id, j.id, {notes: ev.target.value})})]),
+        el("td",{},[el("button",{class:"danger miniBtn", onclick:()=>deleteJob(entry.id, j.id)},["删除岗位"])])
+      ]));
+    });
+    table.appendChild(tbody);
+    wrap.appendChild(table);
+    return wrap;
+  }
+
+  function toggleCard(card){ card.classList.toggle("open"); }
+
+  function renderCompanyCards(){
+    const container = $("#companyList");
+    container.innerHTML = "";
+
+    const q = ($("#mySearch").value || "").trim().toLowerCase();
+    const stFilter = $("#myStatusFilter").value;
+
+    const entries = state.myCompanies.map(eid => state.companyEntries[eid]).filter(Boolean).filter(e => {
+      if(!q) return true;
+      const hay = ([
+        e.cnName, e.enName, e.country, (e.tags||[]).join(","), e.boardName,
+        (e.jobs||[]).map(j => [j.title, j.location, j.salary, j.status, j.notes].join(" ")).join(" ")
+      ].join(" ")).toLowerCase();
+      return hay.includes(q);
+    });
+
+    if(entries.length===0){
+      container.appendChild(el("div", {class:"muted"}, ["你的看板还没有公司/岗位。回到“公司库”勾选并加入。"]));
+      return;
+    }
+
+    entries.forEach(e => {
+      const jobsFiltered = (e.jobs||[]).filter(j => stFilter==="all" ? true : (j.status===stFilter));
+      if(stFilter !== "all" && jobsFiltered.length === 0) return;
+      const jobsForTable = (stFilter === "all") ? (e.jobs||[]) : jobsFiltered;
+      const overall = companyOverallStatus(e);
+      const jobCount = (e.jobs||[]).length;
+
+      const card = el("div", {class:"companyCard"}, []);
+      const head = el("div", {class:"companyHead"}, [
+        el("div", {}, [
+          el("div", {class:"title"}, [e.cnName]),
+          el("div", {class:"subtitle"}, [`${e.enName} · ${e.country || "—"} · 来源：${e.boardName || "—"}`]),
+          el("div", {}, (e.tags||[]).slice(0,6).map(t => el("span",{class:"chip tag"},[t])))
+        ]),
+        el("div", {class:"meta"}, [
+          el("span", {class:"badge"}, [el("strong",{},[String(jobCount)]), " 个岗位"]),
+          el("span", {class:"badge"}, [el("strong",{},[overall]), " 最高进度"]),
+          el("button", {class:"secondary miniBtn", onclick:()=>toggleCard(card)}, ["展开/收起"]),
+          el("button", {class:"secondary miniBtn", onclick:()=>{ addJob(e.id, {status:"未开始"}); renderBoard(); toast("已新增岗位行"); }}, ["新增岗位"]),
+          el("button", {class:"danger miniBtn", onclick:()=>removeCompany(e.id)}, ["移除公司"])
+        ])
+      ]);
+
+      const body = el("div", {class:"companyBody"}, [
+        el("div", {class:"small"}, ["岗位子清单（状态/地点/薪资都按岗位记录）："]),
+        renderJobTable(e, jobsForTable)
+      ]);
+
+      card.appendChild(head);
+      card.appendChild(body);
+      container.appendChild(card);
+    });
+    if(container.children.length === 0){
+      container.appendChild(el("div", {class:"muted"}, ["当前筛选下没有匹配的公司/岗位。可切换到“全部状态”或调整搜索。"]));
+    }
+  }
+
+  function collapseAll(){ document.querySelectorAll(".companyCard").forEach(c => c.classList.remove("open")); }
+  function expandAll(){ document.querySelectorAll(".companyCard").forEach(c => c.classList.add("open")); }
+
+  function sortByNextDate(){
+    const key = (entry) => {
+      const dates = (entry.jobs||[]).map(j=>j.nextDate).filter(Boolean).sort();
+      return dates[0] || "9999-12-31";
+    };
+    state.myCompanies.sort((a,b)=> key(state.companyEntries[a]).localeCompare(key(state.companyEntries[b])));
+    save();
+    renderBoard();
+    toast("已按日期排序公司");
+  }
+
+  function renderBoard(){
+    const head = computeHeadlineStats();
+    const jobBuckets = computeJobBuckets();
+    const companyBuckets = computeCompanyBuckets();
+    renderDonut("donutJobs", jobBuckets, "岗位", Object.values(jobBuckets).reduce((a,b)=>a+b,0));
+    renderDonut("donutCompanies", companyBuckets, "公司", Object.values(companyBuckets).reduce((a,b)=>a+b,0));
+    renderLegend(jobBuckets, companyBuckets);
+    renderStatsCards(head);
+    renderNextList();
+
+    const sel = $("#myStatusFilter");
+    sel.innerHTML = "";
+    sel.appendChild(el("option",{value:"all"},["全部状态"]));
+    STATUSES.forEach(s => sel.appendChild(el("option",{value:s},[s])));
+
+    renderCompanyCards();
+  }
+
+  // --- JD board ---
+  function renderJDCompanySelect(){
+    const sel = $("#jdCompany");
+    sel.innerHTML = "";
+    const options = [];
+    const seen = new Set();
+    state.myCompanies.forEach(eid => {
+      const e = state.companyEntries[eid];
+      if(!e) return;
+      if(seen.has(e.companyId)) return;
+      seen.add(e.companyId);
+      options.push({id: e.companyId, label: `${e.cnName}（${e.enName}）`});
+    });
+    if(options.length===0){
+      const b = BOARDS[0];
+      const c = listBoardCompanies(b)[0];
+      if(c) options.push({id: c.id, label: `${c.cnName}（${c.name}）`});
+    }
+    options.forEach(o => sel.appendChild(el("option",{value:o.id},[o.label])));
+  }
+
+  function jdHay(jd){
+    const c = getCompanyById(jd.companyId) || {};
+    return [jd.title, c.cnName, c.name, (jd.tags||[]).join(","), jd.url, jd.text].join(" ").toLowerCase();
+  }
+
+  function renderJD(){
+    const list = $("#jdList");
+    const q = ($("#jdSearch")?.value || "").trim().toLowerCase();
+    const pr = ($("#jdPriority")?.value || "all");
+
+    const items = (state.jdBoard||[])
+      .slice()
+      .sort((a,b)=> (b.createdAt||"").localeCompare(a.createdAt||""))
+      .filter(jd => {
+        if(pr !== "all" && String(jd.priority) !== String(pr)) return false;
+        if(!q) return true;
+        return jdHay(jd).includes(q);
+      });
+
+    list.innerHTML = "";
+    if(items.length===0){
+      list.appendChild(el("div",{class:"muted"},["暂无 JD。点“新增 JD”开始收集。"]));
+      return;
+    }
+
+    items.forEach(jd => {
+      const c = getCompanyById(jd.companyId) || {};
+      const top = el("div",{class:"jdTop"},[
+        el("div",{},[
+          el("div",{class:"jdTitle"},[jd.title || "（未命名岗位）"]),
+          el("div",{class:"jdMeta"},[`${c.cnName || "（公司）"} · ${c.name || ""} · 优先级：${"★".repeat(Number(jd.priority||3))}`]),
+          jd.url ? el("div",{style:"margin-top:8px;"},[
+            el("a",{class:"linkbtn", href:jd.url, target:"_blank", rel:"noreferrer"},["打开 JD 链接"]),
+            el("span",{class:"tiny", style:"margin-left:8px;"},[jd.url])
+          ]) : el("div")
+        ]),
+        el("div",{class:"jdActions"},[
+          el("button",{class:"secondary miniBtn", onclick:()=>copyText(jd.text || "")},["复制正文"]),
+          el("button",{class:"danger miniBtn", onclick:()=>removeJD(jd.id)},["删除"])
+        ])
+      ]);
+
+      const tagWrap = el("div",{},[]);
+      (jd.tags||[]).slice(0,12).forEach(t => tagWrap.appendChild(el("span",{class:"tag"},[t])));
+      if((jd.tags||[]).length===0) tagWrap.appendChild(el("span",{class:"tag gray"},["无标签"]));
+
+      const preview = el("div",{class:"muted", style:"margin-top:10px; white-space:pre-wrap;"},[
+        (jd.text || "").trim().slice(0, 420) + ((jd.text||"").trim().length > 420 ? " …" : "")
+      ]);
+
+      list.appendChild(el("div",{class:"jdItem"},[top, tagWrap, preview]));
+    });
+  }
+
+  function copyText(text){
+    if(!text){ toast("没有正文可复制"); return; }
+    navigator.clipboard.writeText(text).then(()=>toast("已复制到剪贴板")).catch(()=>toast("复制失败（浏览器不允许）"));
+  }
+
+  function removeJD(id){
+    if(!confirm("确认删除这条 JD？")) return;
+    state.jdBoard = (state.jdBoard||[]).filter(x => x.id !== id);
+    save();
+    renderJD();
+    toast("已删除");
+  }
+
+  function resetJDForm(){
+    renderJDCompanySelect();
+    $("#jdTitle").value = "";
+    $("#jdUrl").value = "";
+    $("#jdText").value = "";
+    $("#jdTags").value = "";
+    $("#jdPrio").value = "3";
+  }
+
+  function addJD(){
+    const companyId = $("#jdCompany").value;
+    const title = $("#jdTitle").value.trim();
+    const url = $("#jdUrl").value.trim();
+    const text = $("#jdText").value.trim();
+    const tags = $("#jdTags").value.split(",").map(x=>x.trim()).filter(Boolean);
+    const priority = Number($("#jdPrio").value || 3);
+
+    if(!companyId){ toast("请选择公司"); return; }
+    if(!title && !text){ toast("至少写“岗位标题”或粘贴 JD 正文"); return; }
+
+    state.jdBoard.push({
+      id: uid(),
+      companyId,
+      title: title || "（未命名岗位）",
+      url,
+      text,
+      tags,
+      priority,
+      createdAt: nowISO()
+    });
+    save();
+    closeModal("#modalJD");
+    resetJDForm();
+    renderJD();
+    toast("JD 已保存");
+  }
+
+  // --- Custom company modal ---
+  function resetCCForm(){
+    $("#ccCn").value = "";
+    $("#ccEn").value = "";
+    $("#ccCountry").value = "";
+    $("#ccTags").value = "";
+    $("#ccLink").value = "";
+  }
+
+  function addCustomCompany(){
+    const cn = $("#ccCn").value.trim();
+    if(!cn){ toast("请填写公司中文名"); return; }
+    const en = $("#ccEn").value.trim();
+    const country = $("#ccCountry").value.trim();
+    const tags = $("#ccTags").value.split(",").map(x=>x.trim()).filter(Boolean);
+    const link = $("#ccLink").value.trim();
+
+    const companyId = "custom::" + uid();
+    state.customCompanies[companyId] = {
+      id: companyId,
+      boardId: "custom",
+      rank: null,
+      name: en || cn,
+      cnName: cn,
+      country: country,
+      tags: tags,
+      link: link,
+      campus: "",
+      boardName: "自定义公司",
+      sourceLabel: "Custom",
+      sourceUrl: ""
+    };
+
+    ensureCompanyEntry(companyId, {status:"未开始"});
+    save();
+    closeModal("#modalCustomCompany");
+    resetCCForm();
+    toast("已添加到看板");
+    renderBoard();
+  }
+
+  // --- Export / Import / Reset ---
+  function exportData(){
+    const blob = new Blob([JSON.stringify(state, null, 2)], {type:"application/json"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    const ts = new Date().toISOString().slice(0,19).replace(/[:T]/g,"-");
+    a.href = url;
+    a.download = `job-board-${ts}.json`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    toast("已导出 JSON");
+  }
+
+  function importData(){
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "application/json";
+    input.onchange = () => {
+      const f = input.files[0];
+      if(!f) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try{
+          const obj = JSON.parse(reader.result);
+          if(!obj || typeof obj !== "object") throw new Error("bad json");
+          state = {...defaultState(), ...obj};
+          state.customCompanies ||= {};
+          state.myCompanies ||= [];
+          state.companyEntries ||= {};
+          state.jdBoard ||= [];
+          save();
+          selected.clear();
+          init();
+          toast("已导入");
+        }catch(e){
+          alert("导入失败：文件格式不对或内容损坏。");
+        }
+      };
+      reader.readAsText(f);
+    };
+    input.click();
+  }
+
+  function resetAll(){
+    if(!confirm("确认重置？会清空本页面所有数据（看板/自定义公司/JD）。")) return;
+    localStorage.removeItem(STORAGE_KEY);
+    state = defaultState();
+    selected.clear();
+    init();
+    toast("已重置");
+  }
+
+  // --- Modals ---
+  function openModal(id){ $(id).classList.add("open"); }
+  function closeModal(id){ $(id).classList.remove("open"); }
+
+  // --- Wire events & init ---
+  function init(){
+    renderBoardList();
+
+    const sel = $("#myStatusFilter");
+    sel.innerHTML = "";
+    sel.appendChild(el("option",{value:"all"},["全部状态"]));
+    STATUSES.forEach(s => sel.appendChild(el("option",{value:s},[s])));
+
+    setView(state.view || "library");
+  }
+
+  $("#tabLibrary").addEventListener("click", ()=>setView("library"));
+  $("#tabBoard").addEventListener("click", ()=>setView("board"));
+  $("#tabJD").addEventListener("click", ()=>setView("jd"));
+
+  $("#libSearch").addEventListener("input", renderLibrary);
+  $("#tagFilter").addEventListener("change", renderLibrary);
+
+  $("#btnSelectAll").addEventListener("click", selectAllFiltered);
+  $("#btnClearSelect").addEventListener("click", clearSelection);
+  $("#btnAddSelectedToBoard").addEventListener("click", addSelectedToBoard);
+  $("#btnAddAllFiltered").addEventListener("click", addAllFilteredToBoard);
+
+  document.querySelectorAll("thead th[data-sort]").forEach(th => th.addEventListener("click", ()=> setLibSort(th.getAttribute("data-sort"))));
+
+  $("#mySearch").addEventListener("input", renderCompanyCards);
+  $("#myStatusFilter").addEventListener("change", renderCompanyCards);
+  $("#btnCollapseAll").addEventListener("click", collapseAll);
+  $("#btnExpandAll").addEventListener("click", expandAll);
+  $("#btnSortNext").addEventListener("click", sortByNextDate);
+
+  $("#btnExport").addEventListener("click", exportData);
+  $("#btnImport").addEventListener("click", importData);
+  $("#btnReset").addEventListener("click", resetAll);
+
+  $("#btnAddCustomCompany").addEventListener("click", ()=>{ resetCCForm(); openModal("#modalCustomCompany"); });
+  $("#closeCustomCompany").addEventListener("click", ()=>closeModal("#modalCustomCompany"));
+  $("#btnCCClear").addEventListener("click", resetCCForm);
+  $("#btnCCSave").addEventListener("click", addCustomCompany);
+
+  function openJD(){ resetJDForm(); openModal("#modalJD"); }
+  $("#btnAddJD").addEventListener("click", openJD);
+  $("#btnAddJD2").addEventListener("click", openJD);
+  $("#closeJD").addEventListener("click", ()=>closeModal("#modalJD"));
+  $("#btnJDClear").addEventListener("click", resetJDForm);
+  $("#btnJDSave").addEventListener("click", addJD);
+
+  $("#jdSearch").addEventListener("input", renderJD);
+  $("#jdPriority").addEventListener("change", renderJD);
+
+  document.addEventListener("keydown", (e)=>{
+    if(e.key === "/"){
+      const active = document.activeElement;
+      const isInput = active && (active.tagName === "INPUT" || active.tagName === "TEXTAREA");
+      if(!isInput){
+        e.preventDefault();
+        if(state.view === "jd") $("#jdSearch").focus();
+        else $("#libSearch").focus();
+      }
+    }
+    if(e.key === "Escape"){
+      closeModal("#modalCustomCompany");
+      closeModal("#modalJD");
+    }
+  });
+
+  ["#modalCustomCompany","#modalJD"].forEach(mid => {
+    $(mid).addEventListener("click", (e)=>{ if(e.target === $(mid)) closeModal(mid); });
+  });
+
+  init();
+})();
+</script>
+</body>
+</html>
