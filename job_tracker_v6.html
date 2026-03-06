@@ -1,0 +1,2823 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+  <title>求职公司库 + 投递看板 + JD 收集</title>
+  <style>
+    :root{
+      --bg:#070a14;
+      --text:#e9ecff;
+      --muted:rgba(233,236,255,.72);
+      --muted2:rgba(233,236,255,.48);
+      --line:#22305b;
+      --accent:#7aa2ff;
+      --good:#3ddc97;
+      --warn:#ffd166;
+      --bad:#ff6b6b;
+      --shadow:0 12px 40px rgba(0,0,0,.42);
+      --radius:18px;
+      --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, "Noto Sans", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --c1:#7aa2ff; --c2:#3ddc97; --c3:#ffd166; --c4:#ff6b6b; --c5:#c084fc; --c6:#94a3b8;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:var(--sans);
+      color:var(--text);
+      background:
+        radial-gradient(1200px 800px at 12% 0%, #1c2a63 0%, rgba(28,42,99,0) 55%),
+        radial-gradient(900px 600px at 86% 8%, #3b1f5c 0%, rgba(59,31,92,0) 55%),
+        linear-gradient(180deg, var(--bg), #050711 70%);
+      min-height:100dvh;
+      overflow-x:hidden;
+      -webkit-text-size-adjust:100%;
+      line-height:1.58;
+      letter-spacing:.1px;
+    }
+    a{color:inherit;text-decoration:none}
+    button{font-family:inherit}
+    input,select,textarea,button{min-width:0}
+
+    .wrap{
+      max-width:1360px;
+      margin:0 auto;
+      padding:
+        calc(18px + env(safe-area-inset-top, 0px))
+        calc(14px + env(safe-area-inset-right, 0px))
+        calc(56px + env(safe-area-inset-bottom, 0px))
+        calc(14px + env(safe-area-inset-left, 0px));
+    }
+
+    header{
+      display:flex;
+      gap:14px;
+      align-items:flex-start;
+      justify-content:space-between;
+      flex-wrap:wrap;
+      margin-bottom:12px;
+    }
+    .hero{min-width:260px;flex:1 1 560px}
+    h1{margin:0;font-size:24px;line-height:1.18;letter-spacing:.2px}
+
+    .subWrap{margin-top:8px;position:relative}
+    .sub{
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.55;
+      max-width:1000px;
+      white-space:pre-wrap;
+    }
+    .subToggle{margin-top:8px;display:none;padding:8px 10px;border-radius:12px;font-size:12px;line-height:1.2}
+
+    .pills{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+    .pill{
+      display:inline-flex;align-items:center;gap:6px;
+      padding:6px 10px;border-radius:999px;
+      border:1px solid rgba(122,162,255,.25);
+      background:rgba(122,162,255,.10);
+      font-size:12px;color:#dbe6ff;white-space:nowrap;line-height:1.2;
+    }
+    .pill.good{border-color:rgba(61,220,151,.25);background:rgba(61,220,151,.10)}
+    .pill.warn{border-color:rgba(255,209,102,.25);background:rgba(255,209,102,.10)}
+    .pill.bad{border-color:rgba(255,107,107,.25);background:rgba(255,107,107,.10)}
+
+    .toolbar{
+      display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:flex-end;flex:0 0 auto;
+    }
+    button,.btn{
+      border:1px solid var(--line);
+      background:linear-gradient(180deg, #18244b, #111a33);
+      color:var(--text);
+      padding:10px 12px;
+      border-radius:12px;
+      cursor:pointer;
+      box-shadow:0 8px 18px rgba(0,0,0,.22);
+      font-weight:850;
+      font-size:13px;
+      line-height:1.15;
+      transition:transform .06s ease, border-color .15s ease, opacity .15s ease, background .15s ease;
+      user-select:none;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      text-decoration:none;
+      white-space:nowrap;
+    }
+    button:hover,.btn:hover{border-color:#3853a8}
+    button:active,.btn:active{transform:translateY(1px)}
+    button.secondary{background:linear-gradient(180deg, #131a34, #0d1328)}
+    button.danger{background:linear-gradient(180deg, #3a1621, #22111a);border-color:#6b2a3c}
+    button.ghost{background:rgba(10,14,28,.55);border-color:rgba(34,48,91,.95);box-shadow:none}
+    button.success{background:linear-gradient(180deg, #173628, #10271d);border-color:#1f6b4a}
+    button:disabled{opacity:.55;cursor:not-allowed}
+
+    .tabsBar{margin:10px 0 12px;position:static}
+    .navTitle{
+      font-size:11px;color:var(--muted2);font-weight:900;letter-spacing:.55px;
+      margin:0 0 10px;line-height:1.2;text-transform:none;
+    }
+    .tabs{display:flex;gap:10px}
+    .tab{
+      flex:1;text-align:center;padding:10px 10px;border-radius:14px;
+      border:1px solid rgba(34,48,91,.95);background:rgba(10,14,28,.55);
+      cursor:pointer;user-select:none;font-weight:900;font-size:13px;line-height:1.15;
+    }
+    .tab.active{border-color:rgba(122,162,255,.45);background:rgba(122,162,255,.10)}
+
+    .layout{display:grid;grid-template-columns:340px minmax(0,1fr);gap:14px;margin-top:14px;align-items:start}
+    .card{
+      background:linear-gradient(180deg, rgba(17,26,51,.92), rgba(10,14,28,.85));
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:16px;
+      min-width:0;
+    }
+    .side{position:sticky;top:12px;height:fit-content}
+    .sideHead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+    #sidePanel.collapsed #sideBody{display:none}
+    #sidePanel.expanded{max-height:min(calc(100vh - 28px), 820px);overflow:auto;-webkit-overflow-scrolling:touch}
+    .sideMeta{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+
+    input[type="text"],input[type="url"],input[type="date"],input[type="number"],textarea,select{
+      width:100%;background:rgba(7,10,20,.55);border:1px solid var(--line);color:var(--text);
+      padding:10px 10px;border-radius:12px;outline:none;font-size:13px;line-height:1.25;
+    }
+    textarea{min-height:110px;resize:vertical;line-height:1.45}
+    label{display:block;font-size:12px;color:var(--muted);margin:0 0 6px 2px;font-weight:900;line-height:1.2}
+    .row{display:flex;gap:10px;flex-wrap:wrap}
+    .row > *{flex:1}
+    .hint{font-size:12px;color:var(--muted2);line-height:1.4}
+    .muted{color:var(--muted);font-size:12px;line-height:1.48}
+    .small{font-size:12px;color:var(--muted2);line-height:1.45}
+    .mono{font-family:var(--mono)}
+
+    .boardList{display:grid;gap:8px}
+    .boardBtn{
+      padding:10px 10px;border-radius:14px;border:1px solid rgba(34,48,91,.95);
+      background:rgba(10,14,28,.55);cursor:pointer;user-select:none;
+    }
+    .boardBtn.active{border-color:rgba(122,162,255,.45);background:rgba(122,162,255,.10)}
+    .boardBtn .name{font-weight:900;font-size:13px;line-height:1.2;display:flex;align-items:center;justify-content:space-between;gap:8px}
+    .boardBtn .desc{margin-top:4px;color:var(--muted2);font-size:12px;line-height:1.35}
+
+    .sectionTitle{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px;flex-wrap:wrap}
+    .sectionTitle h2{margin:0;font-size:16px;letter-spacing:.2px;line-height:1.25}
+    .chips{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .chip{
+      padding:6px 10px;border-radius:999px;border:1px solid rgba(34,48,91,.95);
+      background:rgba(10,14,28,.55);font-size:12px;color:var(--muted);line-height:1.2;
+    }
+
+    .list{display:grid;gap:12px}
+    .company{
+      border:1px solid rgba(34,48,91,.95);background:rgba(10,14,28,.45);
+      border-radius:18px;padding:12px;min-width:0;
+    }
+    .companyTop{
+      display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:10px;align-items:start;margin-bottom:10px;
+    }
+    .companyName{display:flex;flex-direction:column;gap:2px;min-width:0}
+    .companyCheck{display:inline-flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);margin-bottom:6px;user-select:none;cursor:pointer;width:max-content}
+    .companyCheck input{width:16px;height:16px;accent-color:#7aa2ff;cursor:pointer}
+    .companyCheck span{line-height:1.2}
+    .companyName .zh{font-weight:950;font-size:15px;line-height:1.22;word-break:break-word}
+    .companyName .en{color:var(--muted2);font-size:12px;line-height:1.3;word-break:break-word}
+    .companyMeta{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:flex-end}
+    .badge{
+      padding:6px 10px;border-radius:999px;font-size:12px;border:1px solid rgba(122,162,255,.25);
+      background:rgba(122,162,255,.10);color:#dbe6ff;white-space:nowrap;line-height:1.2;
+    }
+    .badge.good{border-color:rgba(61,220,151,.25);background:rgba(61,220,151,.10)}
+    .badge.warn{border-color:rgba(255,209,102,.25);background:rgba(255,209,102,.10)}
+    .badge.bad{border-color:rgba(255,107,107,.25);background:rgba(255,107,107,.10)}
+    .companyActions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:flex-end}
+    .companyLinkRow{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+
+    .posList{display:grid;gap:8px;margin-top:10px}
+    .pos{border:1px solid rgba(34,48,91,.85);background:rgba(5,7,17,.45);border-radius:14px;padding:10px}
+    .posTop{display:flex;gap:10px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap}
+    .posTitle{font-weight:900;font-size:13px;line-height:1.3;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+    .posSub{color:var(--muted2);font-size:12px;margin-top:4px;line-height:1.42}
+    .posGrid{margin-top:10px;display:grid;grid-template-columns:1.2fr .8fr .8fr .9fr .9fr;gap:10px;align-items:end}
+    .posActions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:flex-end}
+
+    .dashGrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(320px, 420px);gap:14px;align-items:start}
+    .kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .kpi{border:1px solid rgba(34,48,91,.95);background:rgba(10,14,28,.55);border-radius:16px;padding:12px}
+    .kpi .label{color:var(--muted2);font-size:12px;font-weight:900;line-height:1.2}
+    .kpi .value{font-size:22px;font-weight:950;margin-top:6px;line-height:1.1}
+    .legend{display:grid;gap:8px;margin-top:10px}
+    .legendItem{display:flex;gap:10px;align-items:center;justify-content:space-between}
+    .dot{width:10px;height:10px;border-radius:999px;background:var(--accent)}
+    .legendLeft{display:flex;gap:10px;align-items:center}
+    .legendLeft span{font-size:12px;color:var(--muted);line-height:1.2}
+    .legendRight{font-size:12px;color:var(--muted2);font-family:var(--mono)}
+
+    .jdList{display:grid;gap:10px}
+    .jd{border:1px solid rgba(34,48,91,.95);background:rgba(10,14,28,.55);border-radius:18px;padding:12px}
+    .jdTop{display:flex;gap:10px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap}
+    .jdTitle{font-weight:950;font-size:14px;line-height:1.25}
+    .jdSub{color:var(--muted2);font-size:12px;margin-top:4px;line-height:1.35;word-break:break-word}
+    .jdActions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .jdTags{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+
+    .toolbarRow{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+
+    .toast{
+      position:fixed;left:50%;transform:translateX(-50%);
+      bottom:calc(18px + env(safe-area-inset-bottom, 0px));
+      background:rgba(10,14,28,.85);border:1px solid rgba(34,48,91,.95);
+      padding:10px 12px;border-radius:14px;box-shadow:var(--shadow);font-size:12px;color:var(--muted);
+      z-index:999;display:none;max-width:min(560px, calc(100vw - 24px));line-height:1.3;
+    }
+
+    .modalBackdrop{
+      position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;
+      padding:16px;z-index:1000;
+    }
+    .modal{
+      width:min(820px, 100%);
+      max-height:min(86dvh, 900px);
+      overflow:auto;
+      background:linear-gradient(180deg, rgba(17,26,51,.98), rgba(10,14,28,.92));
+      border:1px solid rgba(34,48,91,.95);border-radius:20px;box-shadow:var(--shadow);padding:14px;
+    }
+    .modalHeader{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:10px}
+    .modalHeader h3{margin:0;font-size:16px;line-height:1.25}
+    .modalBody{display:grid;gap:10px;margin-top:6px}
+    .modalFooter{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;margin-top:12px}
+
+    @media (max-width: 1180px), (max-height: 780px){
+      .layout{grid-template-columns:1fr}
+      .side{position:static;top:auto}
+      #sidePanel.expanded{max-height:min(56dvh, 620px);overflow:auto}
+      .dashGrid{grid-template-columns:1fr}
+      .companyTop{grid-template-columns:1fr}
+      .companyMeta,.companyActions{justify-content:flex-start}
+      .posGrid{grid-template-columns:1fr 1fr}
+    }
+
+    @media (max-width: 860px){
+      .posGrid{grid-template-columns:1fr}
+      .kpis{grid-template-columns:1fr 1fr}
+      .tabs{padding:8px;border-radius:18px;background:rgba(10,14,28,.72);border:1px solid rgba(34,48,91,.9);gap:8px}
+    }
+
+    @media (max-width: 520px){
+      .wrap{
+        padding:
+          calc(12px + env(safe-area-inset-top, 0px))
+          calc(12px + env(safe-area-inset-right, 0px))
+          calc(44px + env(safe-area-inset-bottom, 0px))
+          calc(12px + env(safe-area-inset-left, 0px));
+      }
+      header{margin-bottom:10px;gap:10px}
+      h1{font-size:18px;line-height:1.18}
+      .pills{flex-wrap:nowrap;overflow:auto;-webkit-overflow-scrolling:touch;padding-bottom:6px}
+      .subToggle{display:inline-flex}
+      .subWrap.collapsed .sub{
+        display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+      }
+      .toolbar{justify-content:flex-start;gap:8px;width:100%}
+      .toolbar button,.toolbar .btn{flex:1 1 calc(50% - 8px);justify-content:center;padding:10px 10px;font-size:14px}
+      input[type="text"],input[type="url"],input[type="date"],input[type="number"],textarea,select{font-size:16px}
+      .tabsBar{
+        position:sticky;top:calc(env(safe-area-inset-top, 0px) + 6px);z-index:80;padding:10px 0 8px;
+        backdrop-filter:blur(10px);
+      }
+      .tab{padding:10px 8px;font-size:12px}
+      .layout{gap:10px;margin-top:10px}
+      .card{padding:12px}
+      #sidePanel.expanded{max-height:62dvh;overflow:auto;-webkit-overflow-scrolling:touch}
+      #sidePanel.collapsed #sideBody{display:none}
+      .kpis{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="hero">
+        <h1 id="titleText">求职公司库 · 投递看板 · JD 收集</h1>
+        <div class="subWrap collapsed" id="subWrap">
+          <div class="sub" id="subText">分类公司库：按世界500强 / 中国互联网 / 中国企业 / 外企跨国等分类浏览，支持单个加入或当前分类一键全选到个人清单
+公司 → 岗位子清单：按岗位跟踪进度（地点 / 薪资 / 渠道 / 状态 / 链接 / 备注）
+公司级链接：支持保存公司投递官网与内推官网
+投递看板 Dashboard：扇形图可视化 + 官网投递数量统计
+JD 收集：收藏喜欢的 JD，方便对照学习
+数据只保存在你浏览器本地（LocalStorage），可导入/导出 JSON 进行备份或跨设备同步</div>
+          <button class="secondary subToggle" id="subToggle" type="button">展开说明</button>
+        </div>
+        <div class="pills" id="pills">
+          <span class="pill good">本地自动保存</span>
+          <span class="pill warn">可导入/导出</span>
+          <span class="pill">分类公司库</span>
+          <span class="pill">单选 / 全选到个人清单</span>
+          <span class="pill">公司官网 / 内推入口</span>
+          <span class="pill">岗位级追踪</span>
+          <span class="pill">扇形图</span>
+          <span class="pill">JD 对照</span>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <button class="ghost" id="langBtn" type="button">中文 / EN</button>
+        <button class="secondary" id="exportBtn" type="button">导出 JSON</button>
+        <button class="secondary" id="importBtn" type="button">导入 JSON</button>
+        <button class="ghost" id="restoreDefaultsBtn" type="button">补充默认公司库</button>
+        <input id="importFile" type="file" accept="application/json" style="display:none"/>
+        <button id="addCompanyBtn" type="button">新增公司</button>
+        <button id="addJdBtn" type="button">新增 JD</button>
+        <button class="danger" id="resetBtn" type="button">重置数据</button>
+      </div>
+    </header>
+
+    <div class="tabsBar">
+      <div class="navTitle" id="navTitle">页面</div>
+      <div class="tabs">
+        <div class="tab active" data-tab="companies" id="tabCompanies">公司库</div>
+        <div class="tab" data-tab="dashboard" id="tabDashboard">投递看板</div>
+        <div class="tab" data-tab="jd" id="tabJd">JD 收集</div>
+      </div>
+    </div>
+
+    <div class="layout">
+      <aside class="side card" id="sidePanel">
+        <div class="sideHead">
+          <div>
+            <div class="navTitle" id="boardTitle">企业清单</div>
+            <div class="sideMeta">
+              <span class="chip" id="sideCountChip">公司 0</span>
+            </div>
+          </div>
+          <button class="ghost" id="sideCollapseBtn" type="button">展开</button>
+        </div>
+
+        <div id="sideBody">
+          <div class="boardList" id="boardList"></div>
+
+          <div style="margin-top:12px" class="navTitle" id="filterTitle">筛选</div>
+          <div class="row">
+            <div>
+              <label id="lblStatus">状态</label>
+              <select id="statusFilter"></select>
+            </div>
+            <div>
+              <label id="lblSource">渠道</label>
+              <select id="sourceFilter"></select>
+            </div>
+          </div>
+
+          <div style="margin-top:10px">
+            <label id="lblSearch">搜索</label>
+            <input id="searchInput" type="text" placeholder="公司 / 岗位 / 标签"/>
+            <div class="hint" id="searchHint" style="margin-top:6px">提示：状态筛选会只显示匹配的公司及其匹配岗位</div>
+          </div>
+
+          <div style="margin-top:12px" class="small" id="syncHint">
+            多人同时用（实时共享）需要云端数据库；目前可用“导出/导入 JSON”在设备之间同步或分享。
+          </div>
+        </div>
+      </aside>
+
+      <main class="main" id="main"></main>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <div class="modalBackdrop" id="modalBackdrop" role="dialog" aria-modal="true">
+    <div class="modal">
+      <div class="modalHeader">
+        <h3 id="modalTitle">Modal</h3>
+        <button class="ghost" id="modalCloseBtn" type="button">关闭</button>
+      </div>
+      <div class="modalBody" id="modalBody"></div>
+      <div class="modalFooter" id="modalFooter"></div>
+    </div>
+  </div>
+
+  <script>
+    const I18N = {
+      zh: {
+        title: "求职公司库 · 投递看板 · JD 收集",
+        subtitle: "分类公司库：按世界500强 / 中国互联网 / 中国企业 / 外企跨国等分类浏览，支持单个加入或当前分类一键全选到个人清单\n公司 → 岗位子清单：按岗位跟踪进度（地点 / 薪资 / 渠道 / 状态 / 链接 / 备注）\n公司级链接：支持保存公司投递官网与内推官网\n投递看板 Dashboard：扇形图可视化 + 官网投递数量统计\nJD 收集：收藏喜欢的 JD，方便对照学习\n数据只保存在你浏览器本地（LocalStorage），可导入/导出 JSON 进行备份或跨设备同步",
+        pages: "页面",
+        companies: "公司库",
+        dashboard: "投递看板",
+        jd: "JD 收集",
+        boards: "企业清单",
+        filters: "筛选",
+        status: "状态",
+        source: "渠道",
+        search: "搜索",
+        searchPh: "公司 / 岗位 / 标签",
+        searchHint: "提示：状态筛选会只显示匹配的公司及其匹配岗位",
+        syncHint: "多人同时用（实时共享）需要云端数据库；目前可用“导出/导入 JSON”在设备之间同步或分享。",
+        export: "导出 JSON",
+        import: "导入 JSON",
+        restoreDefaults: "补充默认公司库",
+        addCompany: "新增公司",
+        addJd: "新增 JD",
+        reset: "重置数据",
+        toggleDescOpen: "展开说明",
+        toggleDescClose: "收起说明",
+        btnClose: "关闭",
+        btnCancel: "取消",
+        btnSave: "保存",
+        btnAdd: "添加",
+        btnEdit: "编辑",
+        btnDelete: "删除",
+        btnAddRole: "新增岗位",
+        btnViewLink: "打开链接",
+        btnOfficial: "投递官网",
+        btnReferral: "内推 / 校招入口",
+        btnAddToMyList: "加入个人清单",
+        btnRemoveFromMyList: "移出个人清单",
+        btnAddVisibleToMyList: "当前筛选结果全选到个人清单",
+        btnSelectVisible: "勾选当前页全部公司",
+        btnClearSelected: "取消勾选",
+        btnAddSelectedToMyList: "勾选项加入个人清单",
+        btnRemoveSelectedFromMyList: "勾选项移出个人清单",
+        btnAddBoardToMyList: "当前分类全选到个人清单",
+        btnRemoveVisibleFromMyList: "当前筛选结果移出个人清单",
+        btnRemoveBoardFromMyList: "当前分类全部移出个人清单",
+        btnImportDefaults: "补充默认公司库",
+        empty: "暂无数据",
+        confirmReset: "确认清空全部数据？此操作不可撤销。",
+        confirmDeleteCompany: "删除公司：",
+        confirmDeleteRole: "删除该岗位？",
+        confirmDeleteJd: "删除该 JD？",
+        toastSaved: "已保存 ✅",
+        toastImported: "已导入 ✅",
+        toastExported: "已导出 ✅",
+        toastReset: "已重置 ✅",
+        toastAddedMyList: "已加入个人清单 ✅",
+        toastRemovedMyList: "已移出个人清单 ✅",
+        toastBulkAdded: "已批量加入个人清单 ✅",
+        toastBulkRemoved: "已批量移出个人清单 ✅",
+        toastMergedDefaults: "已补充默认公司库 ✅",
+        toastImportFail: "导入失败：JSON 格式不正确",
+        board: "分类",
+        personalBoard: "个人清单",
+        sourceBoard: "所属分类",
+        roleTitle: "岗位名称",
+        location: "地点",
+        salary: "薪资",
+        link: "链接",
+        note: "备注",
+        appliedDate: "投递日期",
+        statusNow: "当前状态",
+        sourceNow: "投递渠道",
+        officialUrl: "公司投递官网（可选）",
+        referralUrl: "公司内推 / 校招入口（可选）",
+        tags: "标签（可选，逗号分隔）",
+        companyZh: "公司中文名",
+        companyEn: "公司英文名",
+        companyNote: "公司备注（可选）",
+        companyInMyList: "已在个人清单",
+        companySelected: "勾选",
+        sourceLabel: "来源分类",
+        jdTitle: "JD 标题 / 岗位",
+        jdCompany: "公司（可选）",
+        jdUrl: "JD 链接（可选）",
+        jdTags: "JD 标签（可选）",
+        jdNotes: "JD 备注（可选）",
+        dashKpiRoles: "岗位总数",
+        dashKpiCompanies: "公司数",
+        dashKpiOfficial: "官网投递",
+        dashKpiActive: "进行中",
+        dashChartTitle: "进度分布（岗位）",
+        dashLegend: "状态分布",
+        showCompanies: "公司与岗位",
+        showJd: "JD 列表",
+        showDash: "看板概览",
+        sideExpand: "展开",
+        sideCollapse: "收起",
+        roleCount: "岗位",
+        matchedRoles: "匹配岗位",
+        companiesCount: "公司",
+        noRole: "还没有岗位，点「新增岗位」开始记录。",
+        noRoleMatch: "没有匹配筛选条件的岗位。",
+        noJd: "还没有 JD，点右上角「新增 JD」。",
+        noJdMatch: "没有匹配搜索的 JD。",
+        noLink: "还没有填写链接",
+        noSelectedCompany: "请先勾选公司",
+        totalRolesLabel: "岗位总数",
+        dashboardHint: "看板统计以“岗位”为单位；支持统计官网投递数（渠道 = 官网）。",
+        companiesHint: "分类库与个人清单分离：公司保留在原分类，同时可以单个或批量加入个人清单。状态 / 渠道筛选时，只显示匹配的公司及其匹配岗位。",
+        jdHint: "收藏喜欢的 JD，附链接 / 标签 / 备注，方便对照学习。",
+        modalAddCompany: "新增公司",
+        modalEditCompany: "编辑公司",
+        modalAddRolePrefix: "新增岗位：",
+        modalEditRole: "编辑岗位",
+        modalAddJd: "新增 JD",
+        modalEditJd: "编辑 JD",
+        labelCount: "数量",
+        labelMyList: "个人清单",
+        mergeHint: "把默认公司库中缺失的公司补回来，不覆盖你已有数据。",
+        personalOnly: "只在个人清单中管理的自定义公司也支持添加。",
+        ensureName: "至少填写一个公司名称",
+        roleRequired: "请填写岗位名称",
+        jdRequired: "请填写 JD 标题",
+        noRoleData: "暂无岗位数据",
+        importDefaultsTip: "如你之前误删了部分默认公司，可点这里一键补回；也可以先勾选、再批量加入个人清单。"
+      },
+      en: {
+        title: "Job Tracker · Dashboard · JD Collection",
+        subtitle: "Category library: browse companies by Global 500 / China Internet / China Enterprises / MNCs, and add one or all to My List\nCompany → role sub-list: track each role by location / salary / channel / status / link / notes\nCompany-level links: store official application site and referral site\nDashboard: donut chart + official application counts\nJD collection: save interesting JDs for comparison\nData is stored locally in your browser (LocalStorage); use Import/Export JSON for backup or cross-device sync",
+        pages: "Pages",
+        companies: "Companies",
+        dashboard: "Dashboard",
+        jd: "JD Collection",
+        boards: "Company Lists",
+        filters: "Filters",
+        status: "Status",
+        source: "Channel",
+        search: "Search",
+        searchPh: "Company / Role / Tag",
+        searchHint: "Tip: status filter will only show matched companies and matched roles",
+        syncHint: "Real-time multi-user sharing needs a cloud backend. For now, use Export/Import JSON to sync or share.",
+        export: "Export JSON",
+        import: "Import JSON",
+        restoreDefaults: "Restore default library",
+        addCompany: "Add Company",
+        addJd: "Add JD",
+        reset: "Reset",
+        toggleDescOpen: "Expand",
+        toggleDescClose: "Collapse",
+        btnClose: "Close",
+        btnCancel: "Cancel",
+        btnSave: "Save",
+        btnAdd: "Add",
+        btnEdit: "Edit",
+        btnDelete: "Delete",
+        btnAddRole: "Add Role",
+        btnViewLink: "Open Link",
+        btnOfficial: "Official Site",
+        btnReferral: "Referral / Campus",
+        btnAddToMyList: "Add to My List",
+        btnRemoveFromMyList: "Remove from My List",
+        btnAddVisibleToMyList: "Add visible results to My List",
+        btnSelectVisible: "Select all on this page",
+        btnClearSelected: "Clear selection",
+        btnAddSelectedToMyList: "Add selected to My List",
+        btnRemoveSelectedFromMyList: "Remove selected from My List",
+        btnAddBoardToMyList: "Add this category to My List",
+        btnRemoveVisibleFromMyList: "Remove visible results from My List",
+        btnRemoveBoardFromMyList: "Remove this category from My List",
+        btnImportDefaults: "Restore default library",
+        empty: "No data",
+        confirmReset: "Reset all data? This cannot be undone.",
+        confirmDeleteCompany: "Delete company: ",
+        confirmDeleteRole: "Delete this role?",
+        confirmDeleteJd: "Delete this JD?",
+        toastSaved: "Saved ✅",
+        toastImported: "Imported ✅",
+        toastExported: "Exported ✅",
+        toastReset: "Reset ✅",
+        toastAddedMyList: "Added to My List ✅",
+        toastRemovedMyList: "Removed from My List ✅",
+        toastBulkAdded: "Bulk added to My List ✅",
+        toastBulkRemoved: "Bulk removed from My List ✅",
+        toastMergedDefaults: "Default companies restored ✅",
+        toastImportFail: "Import failed: invalid JSON",
+        board: "Category",
+        personalBoard: "My List",
+        sourceBoard: "Source Category",
+        roleTitle: "Role Title",
+        location: "Location",
+        salary: "Salary",
+        link: "Link",
+        note: "Notes",
+        appliedDate: "Applied Date",
+        statusNow: "Current Status",
+        sourceNow: "Channel",
+        officialUrl: "Official application site (optional)",
+        referralUrl: "Referral / campus entry (optional)",
+        tags: "Tags (optional, comma-separated)",
+        companyZh: "Company Name (CN)",
+        companyEn: "Company Name (EN)",
+        companyNote: "Company Notes (optional)",
+        companyInMyList: "In My List",
+        companySelected: "Select",
+        sourceLabel: "Source",
+        jdTitle: "JD Title / Role",
+        jdCompany: "Company (optional)",
+        jdUrl: "JD URL (optional)",
+        jdTags: "JD Tags (optional)",
+        jdNotes: "JD Notes (optional)",
+        dashKpiRoles: "Total Roles",
+        dashKpiCompanies: "Companies",
+        dashKpiOfficial: "Official Applies",
+        dashKpiActive: "Active",
+        dashChartTitle: "Progress Distribution (Roles)",
+        dashLegend: "Status Breakdown",
+        showCompanies: "Companies & Roles",
+        showJd: "JD List",
+        showDash: "Overview",
+        sideExpand: "Expand",
+        sideCollapse: "Collapse",
+        roleCount: "Roles",
+        matchedRoles: "Matched Roles",
+        companiesCount: "Companies",
+        noRole: "No roles yet. Click “Add Role” to start.",
+        noRoleMatch: "No roles match the filters.",
+        noJd: "No JDs yet. Click “Add JD”.",
+        noJdMatch: "No JDs match search.",
+        noLink: "No links added yet",
+        noSelectedCompany: "Please select at least one company",
+        totalRolesLabel: "Total roles",
+        dashboardHint: "Dashboard metrics are role-based; includes official-site applications (channel = Official).",
+        companiesHint: "The category library and My List are separated: companies stay in their original category and can also be added individually or in bulk to My List. Status / channel filters only show matched companies and matched roles.",
+        jdHint: "Save JDs with link / tags / notes for comparison.",
+        modalAddCompany: "Add Company",
+        modalEditCompany: "Edit Company",
+        modalAddRolePrefix: "Add role: ",
+        modalEditRole: "Edit Role",
+        modalAddJd: "Add JD",
+        modalEditJd: "Edit JD",
+        labelCount: "Count",
+        labelMyList: "My List",
+        mergeHint: "Restore any missing companies from the default library without overwriting your existing data.",
+        personalOnly: "Custom companies managed only in My List are supported too.",
+        ensureName: "Please enter at least one company name",
+        roleRequired: "Role title required",
+        jdRequired: "JD title required",
+        noRoleData: "No role data",
+        importDefaultsTip: "If some default companies were deleted before, restore them here; you can also tick companies one by one or in bulk and add them to My List."
+      }
+    };
+
+    const STATUS = [
+      { key:"all", zh:"全部", en:"All" },
+      { key:"interested", zh:"感兴趣", en:"Interested" },
+      { key:"applied", zh:"已投递", en:"Applied" },
+      { key:"oa", zh:"笔试/OA", en:"OA" },
+      { key:"hr", zh:"HR沟通", en:"HR Screen" },
+      { key:"interview", zh:"面试中", en:"Interviewing" },
+      { key:"offer", zh:"Offer", en:"Offer" },
+      { key:"rejected", zh:"拒绝", en:"Rejected" },
+      { key:"hold", zh:"暂停/保留", en:"On Hold" }
+    ];
+
+    const SOURCE = [
+      { key:"all", zh:"全部", en:"All" },
+      { key:"official", zh:"官网", en:"Official" },
+      { key:"referral", zh:"内推", en:"Referral" },
+      { key:"other", zh:"其他", en:"Other" }
+    ];
+
+    const STATUS_COLORS = {
+      interested:"--c3",
+      applied:"--c1",
+      oa:"--c5",
+      hr:"--c6",
+      interview:"--c2",
+      offer:"--good",
+      rejected:"--bad",
+      hold:"--warn"
+    };
+
+    const STORAGE_KEY = "job_hunting_site_v5";
+    const nowISO = () => new Date().toISOString().slice(0,10);
+    const uid = () => Math.random().toString(16).slice(2) + Date.now().toString(16);
+    const isMobile = () => window.matchMedia && window.matchMedia("(max-width: 520px)").matches;
+    const isCompactDesktop = () => window.matchMedia && window.matchMedia("(max-width: 1180px), (max-height: 780px)").matches;
+
+    const DEFAULT_BOARDS = [
+      { id:"global500", type:"source", zh:"世界500强", en:"Global 500", descZh:"综合大厂 / 名企池", descEn:"Global majors / large employers" },
+      { id:"cn_internet", type:"source", zh:"中国互联网", en:"China Internet", descZh:"互联网 / 平台 / 内容 / 电商", descEn:"Internet / platform / content / e-commerce" },
+      { id:"cn_enterprise", type:"source", zh:"中国企业", en:"China Enterprises", descZh:"制造 / 消费 / 科技 / 物流等", descEn:"Manufacturing / consumer / tech / logistics" },
+      { id:"mnc", type:"source", zh:"外企 / 跨国", en:"MNC / Global", descZh:"外企、咨询、快消、工业等", descEn:"MNCs, consulting, FMCG, industrial" },
+      { id:"personal", type:"personal", zh:"个人清单", en:"My List", descZh:"你想重点投递和跟踪的公司", descEn:"Companies you want to focus on" }
+    ];
+
+    const DEFAULT_LINK_SOURCE = [
+      {
+            "names": [
+                  "苹果",
+                  "Apple"
+            ],
+            "officialUrl": "https://jobs.apple.com/",
+            "referralUrl": "https://jobs.apple.com/en-us/search?team=students-and-grads-STDNT"
+      },
+      {
+            "names": [
+                  "微软",
+                  "Microsoft"
+            ],
+            "officialUrl": "https://careers.microsoft.com/",
+            "referralUrl": "https://careers.microsoft.com/v2/global/en/students"
+      },
+      {
+            "names": [
+                  "亚马逊",
+                  "Amazon"
+            ],
+            "officialUrl": "https://www.amazon.jobs/",
+            "referralUrl": "https://www.amazon.jobs/content/en/career-programs/university"
+      },
+      {
+            "names": [
+                  "谷歌",
+                  "Google"
+            ],
+            "officialUrl": "https://www.google.com/about/careers/applications/jobs/results/",
+            "referralUrl": "https://buildyourfuture.withgoogle.com/"
+      },
+      {
+            "names": [
+                  "Meta"
+            ],
+            "officialUrl": "https://www.metacareers.com/",
+            "referralUrl": "https://www.metacareers.com/careerprograms/"
+      },
+      {
+            "names": [
+                  "英伟达",
+                  "NVIDIA"
+            ],
+            "officialUrl": "https://www.nvidia.com/en-us/about-nvidia/careers/",
+            "referralUrl": "https://www.nvidia.com/en-us/about-nvidia/careers/university-recruiting/"
+      },
+      {
+            "names": [
+                  "特斯拉",
+                  "Tesla"
+            ],
+            "officialUrl": "https://www.tesla.com/careers",
+            "referralUrl": "https://www.tesla.com/students"
+      },
+      {
+            "names": [
+                  "摩根大通",
+                  "JPMorgan Chase"
+            ],
+            "officialUrl": "https://careers.jpmorgan.com/",
+            "referralUrl": "https://careers.jpmorgan.com/global/en/students"
+      },
+      {
+            "names": [
+                  "高盛",
+                  "Goldman Sachs"
+            ],
+            "officialUrl": "https://www.goldmansachs.com/careers/",
+            "referralUrl": "https://www.goldmansachs.com/careers/students"
+      },
+      {
+            "names": [
+                  "汇丰",
+                  "HSBC"
+            ],
+            "officialUrl": "https://www.hsbc.com/careers",
+            "referralUrl": "https://www.hsbc.com/careers/students-and-graduates"
+      },
+      {
+            "names": [
+                  "西门子",
+                  "Siemens",
+                  "西门子中国",
+                  "Siemens China"
+            ],
+            "officialUrl": "https://jobs.siemens.com/",
+            "referralUrl": "https://jobs.siemens.com/careers/student"
+      },
+      {
+            "names": [
+                  "施耐德电气",
+                  "Schneider Electric",
+                  "施耐德中国",
+                  "Schneider Electric China"
+            ],
+            "officialUrl": "https://www.se.com/ww/en/about-us/careers/",
+            "referralUrl": "https://www.se.com/ww/en/about-us/careers/early-careers.jsp"
+      },
+      {
+            "names": [
+                  "ABB"
+            ],
+            "officialUrl": "https://global.abb/group/en/careers",
+            "referralUrl": "https://global.abb/group/en/careers/students"
+      },
+      {
+            "names": [
+                  "壳牌",
+                  "Shell"
+            ],
+            "officialUrl": "https://www.shell.com/careers.html",
+            "referralUrl": "https://www.shell.com/careers/students-and-graduates.html"
+      },
+      {
+            "names": [
+                  "联合利华",
+                  "Unilever",
+                  "联合利华中国",
+                  "Unilever China"
+            ],
+            "officialUrl": "https://careers.unilever.com/",
+            "referralUrl": "https://careers.unilever.com/students-and-graduates"
+      },
+      {
+            "names": [
+                  "宝洁",
+                  "P&G",
+                  "宝洁中国",
+                  "P&G China"
+            ],
+            "officialUrl": "https://www.pgcareers.com/",
+            "referralUrl": "https://www.pgcareers.com/global/en/students"
+      },
+      {
+            "names": [
+                  "欧莱雅",
+                  "L'Oréal",
+                  "欧莱雅中国",
+                  "L'Oréal China",
+                  "欧莱雅旅游零售",
+                  "L'Oréal Travel Retail"
+            ],
+            "officialUrl": "https://careers.loreal.com/",
+            "referralUrl": "https://careers.loreal.com/en_US/jobs/SearchJobs?3_47_3=1689"
+      },
+      {
+            "names": [
+                  "雀巢",
+                  "Nestlé"
+            ],
+            "officialUrl": "https://www.nestle.com/jobs",
+            "referralUrl": "https://www.nestle.com/jobs/students"
+      },
+      {
+            "names": [
+                  "可口可乐",
+                  "Coca-Cola"
+            ],
+            "officialUrl": "https://careers.coca-colacompany.com/",
+            "referralUrl": "https://careers.coca-colacompany.com/students"
+      },
+      {
+            "names": [
+                  "百事公司",
+                  "PepsiCo"
+            ],
+            "officialUrl": "https://www.pepsicojobs.com/",
+            "referralUrl": "https://www.pepsicojobs.com/main/students"
+      },
+      {
+            "names": [
+                  "耐克",
+                  "Nike"
+            ],
+            "officialUrl": "https://jobs.nike.com/",
+            "referralUrl": "https://jobs.nike.com/early-careers"
+      },
+      {
+            "names": [
+                  "阿迪达斯",
+                  "Adidas"
+            ],
+            "officialUrl": "https://careers.adidas-group.com/",
+            "referralUrl": "https://careers.adidas-group.com/students"
+      },
+      {
+            "names": [
+                  "IBM"
+            ],
+            "officialUrl": "https://www.ibm.com/careers",
+            "referralUrl": "https://www.ibm.com/careers/students"
+      },
+      {
+            "names": [
+                  "英特尔",
+                  "Intel"
+            ],
+            "officialUrl": "https://jobs.intel.com/",
+            "referralUrl": "https://jobs.intel.com/page/show/students"
+      },
+      {
+            "names": [
+                  "思科",
+                  "Cisco"
+            ],
+            "officialUrl": "https://jobs.cisco.com/",
+            "referralUrl": "https://jobs.cisco.com/jobs/SearchJobs/students-and-new-grad-jobs"
+      },
+      {
+            "names": [
+                  "字节跳动",
+                  "ByteDance"
+            ],
+            "officialUrl": "https://jobs.bytedance.com/",
+            "referralUrl": "https://jobs.bytedance.com/en/campus"
+      },
+      {
+            "names": [
+                  "腾讯",
+                  "Tencent"
+            ],
+            "officialUrl": "https://join.qq.com/",
+            "referralUrl": "https://join.qq.com/campus.html"
+      },
+      {
+            "names": [
+                  "阿里巴巴",
+                  "Alibaba"
+            ],
+            "officialUrl": "https://careers.alibaba.com/",
+            "referralUrl": "https://talent.alibaba.com/campus"
+      },
+      {
+            "names": [
+                  "美团",
+                  "Meituan"
+            ],
+            "officialUrl": "https://zhaopin.meituan.com/",
+            "referralUrl": "https://zhaopin.meituan.com/"
+      },
+      {
+            "names": [
+                  "京东",
+                  "JD.com"
+            ],
+            "officialUrl": "https://zhaopin.jd.com/",
+            "referralUrl": "https://zhaopin.jd.com/JD/web/index#/campus"
+      },
+      {
+            "names": [
+                  "百度",
+                  "Baidu"
+            ],
+            "officialUrl": "https://talent.baidu.com/",
+            "referralUrl": "https://talent.baidu.com/external/baidu/campus.html"
+      },
+      {
+            "names": [
+                  "拼多多",
+                  "PDD Holdings"
+            ],
+            "officialUrl": "https://www.pddholdings.com/",
+            "referralUrl": "https://www.pddinnovation.com/careers/"
+      },
+      {
+            "names": [
+                  "网易",
+                  "NetEase"
+            ],
+            "officialUrl": "https://zhaopin.netease.com/",
+            "referralUrl": "https://campus.163.com/"
+      },
+      {
+            "names": [
+                  "小米",
+                  "Xiaomi",
+                  "小米汽车",
+                  "Xiaomi EV"
+            ],
+            "officialUrl": "https://hr.xiaomi.com/",
+            "referralUrl": "https://hr.xiaomi.com/campus"
+      },
+      {
+            "names": [
+                  "快手",
+                  "Kuaishou"
+            ],
+            "officialUrl": "https://zhaopin.kuaishou.cn/",
+            "referralUrl": "https://zhaopin.kuaishou.cn/recruit/e/campus"
+      },
+      {
+            "names": [
+                  "哔哩哔哩",
+                  "Bilibili"
+            ],
+            "officialUrl": "https://jobs.bilibili.com/",
+            "referralUrl": "https://jobs.bilibili.com/campus"
+      },
+      {
+            "names": [
+                  "小红书",
+                  "Xiaohongshu"
+            ],
+            "officialUrl": "https://job.xiaohongshu.com/",
+            "referralUrl": "https://job.xiaohongshu.com/campus"
+      },
+      {
+            "names": [
+                  "滴滴",
+                  "DiDi"
+            ],
+            "officialUrl": "https://talent.didiglobal.com/",
+            "referralUrl": "https://talent.didiglobal.com/campus"
+      },
+      {
+            "names": [
+                  "携程",
+                  "Trip.com Group"
+            ],
+            "officialUrl": "https://careers.trip.com/",
+            "referralUrl": "https://careers.trip.com/campus"
+      },
+      {
+            "names": [
+                  "搜狐",
+                  "Sohu"
+            ],
+            "officialUrl": "https://hr.sohu.com/",
+            "referralUrl": "https://campus.sohu.com/"
+      },
+      {
+            "names": [
+                  "新浪",
+                  "Sina"
+            ],
+            "officialUrl": "https://career.sina.com.cn/",
+            "referralUrl": "https://career.sina.com.cn/campus/index.php"
+      },
+      {
+            "names": [
+                  "陌陌",
+                  "Hello Group"
+            ],
+            "officialUrl": "https://www.hellogroup.com/",
+            "referralUrl": ""
+      },
+      {
+            "names": [
+                  "同程旅行",
+                  "Tongcheng Travel"
+            ],
+            "officialUrl": "https://join.ly.com/",
+            "referralUrl": "https://campus.ly.com/"
+      },
+      {
+            "names": [
+                  "58同城",
+                  "58.com"
+            ],
+            "officialUrl": "https://zhaopin.58.com/",
+            "referralUrl": "https://campus.58.com/"
+      },
+      {
+            "names": [
+                  "Boss直聘",
+                  "Kanzhun / BOSS Zhipin"
+            ],
+            "officialUrl": "https://www.zhipin.com/",
+            "referralUrl": ""
+      },
+      {
+            "names": [
+                  "知乎",
+                  "Zhihu"
+            ],
+            "officialUrl": "https://talent.zhihu.com/",
+            "referralUrl": "https://talent.zhihu.com/campus"
+      },
+      {
+            "names": [
+                  "得物",
+                  "Poizon"
+            ],
+            "officialUrl": "https://job.dewu.com/",
+            "referralUrl": "https://job.dewu.com/campus"
+      },
+      {
+            "names": [
+                  "唯品会",
+                  "Vipshop"
+            ],
+            "officialUrl": "https://careers.vip.com/",
+            "referralUrl": "https://campus.vipshop.com/"
+      },
+      {
+            "names": [
+                  "爱奇艺",
+                  "iQIYI"
+            ],
+            "officialUrl": "https://zhaopin.iqiyi.com/",
+            "referralUrl": "https://campus.iqiyi.com/"
+      },
+      {
+            "names": [
+                  "腾讯音乐",
+                  "Tencent Music"
+            ],
+            "officialUrl": "https://join.tencentmusic.com/",
+            "referralUrl": "https://join.tencentmusic.com/campus"
+      },
+      {
+            "names": [
+                  "华为",
+                  "Huawei"
+            ],
+            "officialUrl": "https://career.huawei.com/",
+            "referralUrl": "https://career.huawei.com/reccampportal/portal5/index.html"
+      },
+      {
+            "names": [
+                  "比亚迪",
+                  "BYD"
+            ],
+            "officialUrl": "https://careers.bydeurope.com/",
+            "referralUrl": "https://job.byd.com/"
+      },
+      {
+            "names": [
+                  "宁德时代",
+                  "CATL"
+            ],
+            "officialUrl": "https://catl.zhiye.com/",
+            "referralUrl": "https://catl.zhiye.com/campus"
+      },
+      {
+            "names": [
+                  "中芯国际",
+                  "SMIC"
+            ],
+            "officialUrl": "https://careers.smics.com/",
+            "referralUrl": "https://careers.smics.com/campus"
+      },
+      {
+            "names": [
+                  "联想",
+                  "Lenovo"
+            ],
+            "officialUrl": "https://jobs.lenovo.com/",
+            "referralUrl": "https://jobs.lenovo.com/students-and-graduates"
+      },
+      {
+            "names": [
+                  "大疆",
+                  "DJI"
+            ],
+            "officialUrl": "https://careers.dji.com/",
+            "referralUrl": "https://campus.dji.com/"
+      },
+      {
+            "names": [
+                  "安克创新",
+                  "Anker Innovations"
+            ],
+            "officialUrl": "https://jobs.anker.com/",
+            "referralUrl": "https://campus.anker.com/"
+      },
+      {
+            "names": [
+                  "美的",
+                  "Midea"
+            ],
+            "officialUrl": "https://careers.midea.com/",
+            "referralUrl": "https://campus.midea.com/"
+      },
+      {
+            "names": [
+                  "海尔",
+                  "Haier"
+            ],
+            "officialUrl": "https://zhaopin.haier.com/",
+            "referralUrl": "https://campus.haier.com/"
+      },
+      {
+            "names": [
+                  "格力",
+                  "Gree"
+            ],
+            "officialUrl": "https://job.gree.com/",
+            "referralUrl": "https://job.gree.com/campus"
+      },
+      {
+            "names": [
+                  "理想汽车",
+                  "Li Auto"
+            ],
+            "officialUrl": "https://jobs.lixiang.com/",
+            "referralUrl": "https://jobs.lixiang.com/campus"
+      },
+      {
+            "names": [
+                  "蔚来",
+                  "NIO"
+            ],
+            "officialUrl": "https://www.nio.com/careers",
+            "referralUrl": "https://www.nio.com/careers?campus=1"
+      },
+      {
+            "names": [
+                  "小鹏汽车",
+                  "XPeng"
+            ],
+            "officialUrl": "https://www.xpeng.com/join-us",
+            "referralUrl": "https://campus.xiaopeng.com/"
+      },
+      {
+            "names": [
+                  "顺丰",
+                  "SF Express"
+            ],
+            "officialUrl": "https://hr.sf-express.com/",
+            "referralUrl": "https://campus.sf-express.com/"
+      },
+      {
+            "names": [
+                  "京东方",
+                  "BOE"
+            ],
+            "officialUrl": "https://zhaopin.boe.com/",
+            "referralUrl": "https://campus.boe.com/"
+      },
+      {
+            "names": [
+                  "隆基绿能",
+                  "LONGi"
+            ],
+            "officialUrl": "https://careers.longi.com/",
+            "referralUrl": "https://campus.longi.com/"
+      },
+      {
+            "names": [
+                  "上汽集团",
+                  "SAIC Motor"
+            ],
+            "officialUrl": "https://job.saicmotor.com/",
+            "referralUrl": "https://campus.saicmotor.com/"
+      },
+      {
+            "names": [
+                  "广汽集团",
+                  "GAC Group"
+            ],
+            "officialUrl": "https://job.gac.com.cn/",
+            "referralUrl": "https://campus.gac.com.cn/"
+      },
+      {
+            "names": [
+                  "吉利汽车",
+                  "Geely"
+            ],
+            "officialUrl": "https://join.geely.com/",
+            "referralUrl": "https://campus.geely.com/"
+      },
+      {
+            "names": [
+                  "三一重工",
+                  "SANY"
+            ],
+            "officialUrl": "https://hr.sany.com.cn/",
+            "referralUrl": "https://campus.sany.com.cn/"
+      },
+      {
+            "names": [
+                  "伊利",
+                  "Yili"
+            ],
+            "officialUrl": "https://career.yili.com/",
+            "referralUrl": "https://campus.yili.com/"
+      },
+      {
+            "names": [
+                  "蒙牛",
+                  "Mengniu"
+            ],
+            "officialUrl": "https://joinus.mengniu.com.cn/",
+            "referralUrl": "https://campus.mengniu.com.cn/"
+      },
+      {
+            "names": [
+                  "泡泡玛特",
+                  "Pop Mart"
+            ],
+            "officialUrl": "https://join.popmart.com/",
+            "referralUrl": "https://campus.popmart.com/"
+      },
+      {
+            "names": [
+                  "名创优品",
+                  "MINISO"
+            ],
+            "officialUrl": "https://careers.miniso.com/",
+            "referralUrl": "https://careers.miniso.com/campus"
+      },
+      {
+            "names": [
+                  "德勤",
+                  "Deloitte"
+            ],
+            "officialUrl": "https://www.deloitte.com/global/en/careers.html",
+            "referralUrl": "https://www.deloitte.com/uk/en/careers/students.html"
+      },
+      {
+            "names": [
+                  "普华永道",
+                  "PwC"
+            ],
+            "officialUrl": "https://www.pwc.com/gx/en/careers.html",
+            "referralUrl": "https://www.pwc.co.uk/careers/student-jobs.html"
+      },
+      {
+            "names": [
+                  "安永",
+                  "EY"
+            ],
+            "officialUrl": "https://www.ey.com/en_gl/careers",
+            "referralUrl": "https://www.ey.com/en_gl/careers/students"
+      },
+      {
+            "names": [
+                  "毕马威",
+                  "KPMG"
+            ],
+            "officialUrl": "https://kpmg.com/uk/en/careers.html",
+            "referralUrl": "https://kpmg.com/uk/en/home/careers/graduate.html"
+      },
+      {
+            "names": [
+                  "麦肯锡",
+                  "McKinsey & Company"
+            ],
+            "officialUrl": "https://www.mckinsey.com/careers",
+            "referralUrl": "https://www.mckinsey.com/careers/students"
+      },
+      {
+            "names": [
+                  "贝恩",
+                  "Bain & Company"
+            ],
+            "officialUrl": "https://www.bain.com/careers/",
+            "referralUrl": "https://www.bain.com/careers/meet-us/on-campus/"
+      },
+      {
+            "names": [
+                  "波士顿咨询",
+                  "BCG"
+            ],
+            "officialUrl": "https://careers.bcg.com/",
+            "referralUrl": "https://careers.bcg.com/global/en/on-campus"
+      },
+      {
+            "names": [
+                  "强生",
+                  "Johnson & Johnson"
+            ],
+            "officialUrl": "https://careers.jnj.com/",
+            "referralUrl": "https://careers.jnj.com/students"
+      },
+      {
+            "names": [
+                  "罗氏",
+                  "Roche"
+            ],
+            "officialUrl": "https://careers.roche.com/",
+            "referralUrl": "https://careers.roche.com/global/en/students-and-graduates"
+      },
+      {
+            "names": [
+                  "诺华",
+                  "Novartis"
+            ],
+            "officialUrl": "https://www.novartis.com/careers",
+            "referralUrl": "https://www.novartis.com/careers/early-careers"
+      },
+      {
+            "names": [
+                  "赛诺菲",
+                  "Sanofi"
+            ],
+            "officialUrl": "https://jobs.sanofi.com/",
+            "referralUrl": "https://jobs.sanofi.com/early-careers"
+      },
+      {
+            "names": [
+                  "欧姆龙",
+                  "Omron"
+            ],
+            "officialUrl": "https://www.omron.com/global/en/careers/",
+            "referralUrl": "https://www.omron.com/global/en/careers/new-graduates/"
+      },
+      {
+            "names": [
+                  "博世",
+                  "Bosch"
+            ],
+            "officialUrl": "https://careers.bosch.com/",
+            "referralUrl": "https://careers.bosch.com/global/en/students/"
+      },
+      {
+            "names": [
+                  "达能",
+                  "Danone"
+            ],
+            "officialUrl": "https://careers.danone.com/",
+            "referralUrl": "https://careers.danone.com/global/en/students-and-graduates"
+      },
+      {
+            "names": [
+                  "玛氏",
+                  "Mars"
+            ],
+            "officialUrl": "https://careers.mars.com/",
+            "referralUrl": "https://careers.mars.com/us/en/students-and-graduates"
+      },
+      {
+            "names": [
+                  "百威",
+                  "AB InBev"
+            ],
+            "officialUrl": "https://careers.abinbev.com/",
+            "referralUrl": "https://careers.abinbev.com/global/en/graduate-management-trainee-programme"
+      },
+      {
+            "names": [
+                  "开云集团",
+                  "Kering"
+            ],
+            "officialUrl": "https://www.kering.com/en/talent/",
+            "referralUrl": "https://www.kering.com/en/talent/students-graduates/"
+      },
+      {
+            "names": [
+                  "路威酩轩",
+                  "LVMH"
+            ],
+            "officialUrl": "https://www.jobs.lvmh.com/",
+            "referralUrl": "https://www.insidelvmh.com/"
+      },
+      {
+            "names": [
+                  "欧特克",
+                  "Autodesk"
+            ],
+            "officialUrl": "https://www.autodesk.com/careers",
+            "referralUrl": "https://www.autodesk.com/careers/students-and-graduates"
+      }
+];
+
+    const DEFAULT_COMPANY_LINKS = (() => {
+      const out = {};
+      DEFAULT_LINK_SOURCE.forEach(item => {
+        (item.names || []).forEach(name => {
+          out[normalize(name)] = { officialUrl: item.officialUrl || "", referralUrl: item.referralUrl || "" };
+        });
+      });
+      return out;
+    })();
+
+    function getDefaultLinkInfo(nameZh, nameEn){
+      return DEFAULT_COMPANY_LINKS[normalize(nameEn)] || DEFAULT_COMPANY_LINKS[normalize(nameZh)] || null;
+    }
+    function enrichCompanyWithDefaultLinks(company){
+      const info = getDefaultLinkInfo(company.nameZh, company.nameEn);
+      if(!info) return company;
+      return {
+        ...company,
+        officialUrl: company.officialUrl || info.officialUrl || "",
+        referralUrl: company.referralUrl || info.referralUrl || ""
+      };
+    }
+    function enrichCompaniesWithDefaultLinks(companies){
+      return (companies || []).map(enrichCompanyWithDefaultLinks);
+    }
+
+    function defaultCompanies(){
+      const groups = {
+        global500: [
+          ["苹果","Apple"],["微软","Microsoft"],["亚马逊","Amazon"],["谷歌","Google"],["Meta","Meta"],
+          ["英伟达","NVIDIA"],["特斯拉","Tesla"],["摩根大通","JPMorgan Chase"],["高盛","Goldman Sachs"],["汇丰","HSBC"],
+          ["西门子","Siemens"],["施耐德电气","Schneider Electric"],["ABB","ABB"],["壳牌","Shell"],["联合利华","Unilever"],
+          ["宝洁","P&G"],["欧莱雅","L'Oréal"],["雀巢","Nestlé"],["可口可乐","Coca-Cola"],["百事公司","PepsiCo"],
+          ["耐克","Nike"],["阿迪达斯","Adidas"],["IBM","IBM"],["英特尔","Intel"],["思科","Cisco"],
+          ["三星","Samsung"],["丰田","Toyota"],["索尼","Sony"],["甲骨文","Oracle"],["SAP","SAP"]
+        ],
+        cn_internet: [
+          ["字节跳动","ByteDance"],["腾讯","Tencent"],["阿里巴巴","Alibaba"],["美团","Meituan"],["京东","JD.com"],
+          ["百度","Baidu"],["拼多多","PDD Holdings"],["网易","NetEase"],["小米","Xiaomi"],["快手","Kuaishou"],
+          ["哔哩哔哩","Bilibili"],["小红书","Xiaohongshu"],["滴滴","DiDi"],["携程","Trip.com Group"],["搜狐","Sohu"],
+          ["新浪","Sina"],["同程旅行","Tongcheng Travel"],["58同城","58.com"],["Boss直聘","Kanzhun / BOSS Zhipin"],["知乎","Zhihu"],
+          ["得物","Poizon"],["唯品会","Vipshop"],["爱奇艺","iQIYI"],["腾讯音乐","Tencent Music"],["猿辅导","Yuanfudao"],
+          ["作业帮","Zuoyebang"],["安居客","Anjuke"],["贝壳","KE Holdings"],["途虎养车","Tuhu"],["马蜂窝","Mafengwo"]
+        ],
+        cn_enterprise: [
+          ["华为","Huawei"],["比亚迪","BYD"],["宁德时代","CATL"],["中芯国际","SMIC"],["联想","Lenovo"],
+          ["大疆","DJI"],["安克创新","Anker Innovations"],["美的","Midea"],["海尔","Haier"],["格力","Gree"],
+          ["理想汽车","Li Auto"],["蔚来","NIO"],["小鹏汽车","XPeng"],["顺丰","SF Express"],["京东方","BOE"],
+          ["隆基绿能","LONGi"],["上汽集团","SAIC Motor"],["广汽集团","GAC Group"],["吉利汽车","Geely"],["三一重工","SANY"],
+          ["伊利","Yili"],["蒙牛","Mengniu"],["泡泡玛特","Pop Mart"],["名创优品","MINISO"],["海康威视","Hikvision"],
+          ["科大讯飞","iFlytek"],["中兴通讯","ZTE"],["TCL","TCL"],["中国中车","CRRC"],["中国移动","China Mobile"]
+        ],
+        mnc: [
+          ["德勤","Deloitte"],["普华永道","PwC"],["安永","EY"],["毕马威","KPMG"],["麦肯锡","McKinsey & Company"],
+          ["贝恩","Bain & Company"],["波士顿咨询","BCG"],["欧莱雅中国","L'Oréal China"],["联合利华中国","Unilever China"],["宝洁中国","P&G China"],
+          ["强生","Johnson & Johnson"],["罗氏","Roche"],["诺华","Novartis"],["赛诺菲","Sanofi"],["欧姆龙","Omron"],
+          ["博世","Bosch"],["西门子中国","Siemens China"],["施耐德中国","Schneider Electric China"],["达能","Danone"],["玛氏","Mars"],
+          ["百威","AB InBev"],["开云集团","Kering"],["路威酩轩","LVMH"],["欧特克","Autodesk"],["埃森哲","Accenture"],
+          ["Adobe","Adobe"],["Salesforce","Salesforce"],["开利","Carrier"],["飞利浦","Philips"],["宜家","IKEA"]
+        ]
+      };
+
+      const companies = [];
+      Object.entries(groups).forEach(([boardId, arr]) => {
+        arr.forEach(([zh, en]) => {
+          companies.push(enrichCompanyWithDefaultLinks({
+            id: uid(),
+            nameZh: zh,
+            nameEn: en,
+            tags: [],
+            note: "",
+            sourceBoardId: boardId,
+            officialUrl: "",
+            referralUrl: "",
+            roles: []
+          }));
+        });
+      });
+      return companies;
+    }
+
+    function ensureDefaultCoverage(companies){
+      const current = Array.isArray(companies) ? enrichCompaniesWithDefaultLinks(companies) : [];
+      const defaults = defaultCompanies();
+      const existing = new Set(current.map(c => `${normalize(c.nameZh)}|${normalize(c.nameEn)}|${c.sourceBoardId}`));
+      defaults.forEach(c => {
+        const key = `${normalize(c.nameZh)}|${normalize(c.nameEn)}|${c.sourceBoardId}`;
+        if(!existing.has(key)){
+          current.push(c);
+          existing.add(key);
+        }
+      });
+      return current;
+    }
+
+    function defaultState(){
+      const companies = defaultCompanies();
+      return {
+        version: 6,
+        lang: "zh",
+        activeTab: "companies",
+        activeBoardId: "global500",
+        filters: { status:"all", source:"all", q:"" },
+        ui: { sideCollapsed: null, selectedCompanyIds: [] },
+        boards: structuredClone(DEFAULT_BOARDS),
+        companies,
+        personalCompanyIds: [],
+        jd: []
+      };
+    }
+
+    function clone(v){
+      if(typeof structuredClone === "function") return structuredClone(v);
+      return JSON.parse(JSON.stringify(v));
+    }
+
+    function migrateState(parsed){
+      if(!parsed || typeof parsed !== "object") return defaultState();
+      if(parsed.version === 6 || parsed.version === 5 || parsed.version === 4) return normalizeState(parsed);
+
+      const next = defaultState();
+      next.lang = parsed.lang || next.lang;
+      next.activeTab = parsed.activeTab || next.activeTab;
+      next.filters = parsed.filters || next.filters;
+      next.ui = { ...next.ui, ...(parsed.ui || {}) };
+      next.jd = Array.isArray(parsed.jd) ? parsed.jd : [];
+
+      if(Array.isArray(parsed.companies) && parsed.companies.length){
+        next.companies = parsed.companies.map(c => ({
+          id: c.id || uid(),
+          nameZh: c.nameZh || c.zh || c.name || "",
+          nameEn: c.nameEn || c.en || "",
+          tags: Array.isArray(c.tags) ? c.tags : [],
+          note: c.note || "",
+          sourceBoardId: resolveLegacyBoardId(c.boardId),
+          officialUrl: c.officialUrl || c.website || "",
+          referralUrl: c.referralUrl || "",
+          roles: Array.isArray(c.roles) ? c.roles : []
+        }));
+      }
+
+      const personalIds = new Set();
+      if(Array.isArray(parsed.boards)){
+        const personalBoard = parsed.boards.find(b => b.id === "personal");
+        (personalBoard?.companyIds || []).forEach(id => personalIds.add(id));
+      }
+      next.personalCompanyIds = Array.from(personalIds);
+
+      next.activeBoardId = next.boards.some(b => b.id === parsed.activeBoardId) ? parsed.activeBoardId : next.activeBoardId;
+      next.companies = ensureDefaultCoverage(next.companies);
+      return normalizeState(next);
+    }
+
+    function resolveLegacyBoardId(id){
+      if(["global500","cn_internet","cn_enterprise","mnc"].includes(id)) return id;
+      if(id === "cn_industry") return "cn_enterprise";
+      if(id === "personal") return "cn_enterprise";
+      return "global500";
+    }
+
+    function normalizeState(s){
+      const next = defaultState();
+      next.lang = s.lang || next.lang;
+      next.activeTab = ["companies","dashboard","jd"].includes(s.activeTab) ? s.activeTab : next.activeTab;
+      next.activeBoardId = DEFAULT_BOARDS.some(b => b.id === s.activeBoardId) ? s.activeBoardId : next.activeBoardId;
+      next.filters = { ...next.filters, ...(s.filters || {}) };
+      next.ui = { ...next.ui, ...(s.ui || {}) };
+      next.ui.selectedCompanyIds = Array.isArray(next.ui.selectedCompanyIds) ? Array.from(new Set(next.ui.selectedCompanyIds)) : [];
+      next.boards = clone(DEFAULT_BOARDS);
+      next.companies = Array.isArray(s.companies) ? ensureDefaultCoverage(s.companies.map(c => ({
+        id: c.id || uid(),
+        nameZh: c.nameZh || "",
+        nameEn: c.nameEn || "",
+        tags: Array.isArray(c.tags) ? c.tags : [],
+        note: c.note || "",
+        sourceBoardId: DEFAULT_BOARDS.some(b => b.id === c.sourceBoardId && b.type === "source") ? c.sourceBoardId : resolveLegacyBoardId(c.boardId),
+        officialUrl: c.officialUrl || "",
+        referralUrl: c.referralUrl || "",
+        roles: Array.isArray(c.roles) ? c.roles : []
+      }))) : ensureDefaultCoverage(next.companies);
+      next.personalCompanyIds = Array.isArray(s.personalCompanyIds) ? Array.from(new Set(s.personalCompanyIds)) : [];
+      next.jd = Array.isArray(s.jd) ? s.jd : [];
+      next.version = 6;
+      return next;
+    }
+
+    function loadState(){
+      try{
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if(raw) return migrateState(JSON.parse(raw));
+
+        const legacyV5 = localStorage.getItem("job_hunting_site_v5");
+        if(legacyV5) return migrateState(JSON.parse(legacyV5));
+
+        const legacyV4 = localStorage.getItem("job_hunting_site_v4");
+        if(legacyV4) return migrateState(JSON.parse(legacyV4));
+
+        const legacyRaw = localStorage.getItem("job_hunting_site_v3");
+        if(legacyRaw) return migrateState(JSON.parse(legacyRaw));
+
+        return defaultState();
+      }catch(e){
+        return defaultState();
+      }
+    }
+
+    let state = loadState();
+    let saveTimer = null;
+
+    function saveState(showToast=true){
+      try{
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        if(showToast) toast(t().toastSaved);
+      }catch(e){
+        toast("保存失败（LocalStorage）");
+      }
+    }
+    function scheduleSave(){
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(()=>saveState(false), 220);
+    }
+
+    const $ = (sel, root=document) => root.querySelector(sel);
+    const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
+    const t = () => I18N[state.lang];
+    const activeBoard = () => state.boards.find(b => b.id === state.activeBoardId) || state.boards[0];
+    const personalSet = () => new Set(state.personalCompanyIds || []);
+    const selectedSet = () => new Set(state.ui?.selectedCompanyIds || []);
+
+    function toast(msg){
+      const el = $("#toast");
+      el.textContent = msg;
+      el.style.display = "block";
+      clearTimeout(el._timer);
+      el._timer = setTimeout(()=>{ el.style.display = "none"; }, 1600);
+    }
+
+    function statusLabel(key){
+      const item = STATUS.find(s => s.key === key);
+      return item ? item[state.lang] : key;
+    }
+    function sourceLabel(key){
+      const item = SOURCE.find(s => s.key === key);
+      return item ? item[state.lang] : key;
+    }
+    function boardLabel(id){
+      const b = state.boards.find(x => x.id === id);
+      return b ? (state.lang === "zh" ? b.zh : b.en) : id;
+    }
+    function boardDesc(id){
+      const b = state.boards.find(x => x.id === id);
+      return b ? (state.lang === "zh" ? b.descZh : b.descEn) : "";
+    }
+    function statusColorVar(key){
+      const v = STATUS_COLORS[key] || "--accent";
+      return getComputedStyle(document.documentElement).getPropertyValue(v).trim() || "#7aa2ff";
+    }
+    function normalize(s){ return (s || "").toLowerCase().trim(); }
+
+    function setText(){
+      $("#titleText").textContent = t().title;
+      $("#subText").textContent = t().subtitle;
+      $("#navTitle").textContent = t().pages;
+      $("#tabCompanies").textContent = t().companies;
+      $("#tabDashboard").textContent = t().dashboard;
+      $("#tabJd").textContent = t().jd;
+      $("#boardTitle").textContent = t().boards;
+      $("#filterTitle").textContent = t().filters;
+      $("#lblStatus").textContent = t().status;
+      $("#lblSource").textContent = t().source;
+      $("#lblSearch").textContent = t().search;
+      $("#searchInput").placeholder = t().searchPh;
+      $("#searchHint").textContent = t().searchHint;
+      $("#syncHint").textContent = t().syncHint;
+      $("#exportBtn").textContent = t().export;
+      $("#importBtn").textContent = t().import;
+      if($("#restoreDefaultsBtn")) $("#restoreDefaultsBtn").textContent = t().restoreDefaults;
+      $("#addCompanyBtn").textContent = t().addCompany;
+      $("#addJdBtn").textContent = t().addJd;
+      $("#resetBtn").textContent = t().reset;
+      $("#modalCloseBtn").textContent = t().btnClose;
+
+      const wrap = $("#subWrap");
+      const btn = $("#subToggle");
+      if(wrap && btn) btn.textContent = wrap.classList.contains("collapsed") ? t().toggleDescOpen : t().toggleDescClose;
+
+      syncSideCollapseUI();
+      updateSideCountChip();
+    }
+
+    function ensureSideDefault(){
+      if(state.ui.sideCollapsed === null || typeof state.ui.sideCollapsed === "undefined"){
+        state.ui.sideCollapsed = isMobile() || isCompactDesktop();
+        scheduleSave();
+      }
+      syncSideCollapseUI();
+    }
+
+    function syncSideCollapseUI(){
+      const side = $("#sidePanel");
+      const btn = $("#sideCollapseBtn");
+      if(!side || !btn) return;
+      const collapsed = !!state.ui.sideCollapsed;
+      side.classList.toggle("collapsed", collapsed);
+      side.classList.toggle("expanded", !collapsed);
+      btn.textContent = collapsed ? t().sideExpand : t().sideCollapse;
+    }
+
+    function toggleSide(){
+      state.ui.sideCollapsed = !state.ui.sideCollapsed;
+      scheduleSave();
+      syncSideCollapseUI();
+    }
+
+    function updateSideCountChip(){
+      const n = companiesInActiveBoard().length;
+      const chip = $("#sideCountChip");
+      if(chip) chip.textContent = `${t().companiesCount} ${n}`;
+    }
+
+    function companiesInActiveBoard(){
+      const board = activeBoard();
+      if(board.type === "personal"){
+        const ids = personalSet();
+        return state.companies.filter(c => ids.has(c.id));
+      }
+      return state.companies.filter(c => c.sourceBoardId === board.id);
+    }
+
+    function roleMatchesFilter(role){
+      const f = state.filters;
+      const statusOk = f.status === "all" ? true : role.status === f.status;
+      const sourceOk = f.source === "all" ? true : role.source === f.source;
+      const q = normalize(f.q);
+      if(!q) return statusOk && sourceOk;
+      const hay = [role.title, role.location, role.salary, role.note, role.link, role.status, role.source].join(" ");
+      return statusOk && sourceOk && normalize(hay).includes(q);
+    }
+
+    function companyMatchesFilter(company){
+      const f = state.filters;
+      const q = normalize(f.q);
+      const companyText = normalize([
+        company.nameZh, company.nameEn, ...(company.tags || []), company.note || "", company.officialUrl || "", company.referralUrl || ""
+      ].join(" "));
+      const companyTextOk = q ? companyText.includes(q) : true;
+
+      if(f.status === "all" && f.source === "all"){
+        if(q) return companyTextOk || (company.roles || []).some(r => roleMatchesFilter(r));
+        return true;
+      }
+      return (company.roles || []).some(r => roleMatchesFilter(r)) || (q && companyTextOk);
+    }
+
+    function filteredCompanies(){
+      return companiesInActiveBoard().filter(companyMatchesFilter);
+    }
+
+    function render(){
+      ensureSideDefault();
+      setText();
+      renderBoards();
+      renderFilters();
+      renderTabs();
+
+      const main = $("#main");
+      main.innerHTML = "";
+      if(state.activeTab === "companies") renderCompanies(main);
+      if(state.activeTab === "dashboard") renderDashboard(main);
+      if(state.activeTab === "jd") renderJd(main);
+    }
+
+    function renderTabs(){
+      $$(".tab").forEach(el => el.classList.toggle("active", el.dataset.tab === state.activeTab));
+    }
+
+    function renderBoards(){
+      const list = $("#boardList");
+      list.innerHTML = "";
+      const personalIds = personalSet();
+
+      for(const b of state.boards){
+        const count = b.type === "personal"
+          ? state.companies.filter(c => personalIds.has(c.id)).length
+          : state.companies.filter(c => c.sourceBoardId === b.id).length;
+
+        const div = document.createElement("div");
+        div.className = "boardBtn" + (b.id === state.activeBoardId ? " active" : "");
+        div.innerHTML = `
+          <div class="name">
+            <span>${escapeHtml(state.lang === "zh" ? b.zh : b.en)}</span>
+            <span class="chip">${count}</span>
+          </div>
+          <div class="desc">${escapeHtml(state.lang === "zh" ? b.descZh : b.descEn)}</div>
+        `;
+        div.addEventListener("click", () => {
+          state.activeBoardId = b.id;
+          scheduleSave();
+          render();
+        });
+        list.appendChild(div);
+      }
+    }
+
+    function renderFilters(){
+      const statusSel = $("#statusFilter");
+      const sourceSel = $("#sourceFilter");
+      const q = $("#searchInput");
+
+      statusSel.innerHTML = "";
+      STATUS.forEach(s => {
+        const opt = document.createElement("option");
+        opt.value = s.key;
+        opt.textContent = s[state.lang];
+        statusSel.appendChild(opt);
+      });
+      statusSel.value = state.filters.status;
+
+      sourceSel.innerHTML = "";
+      SOURCE.forEach(s => {
+        const opt = document.createElement("option");
+        opt.value = s.key;
+        opt.textContent = s[state.lang];
+        sourceSel.appendChild(opt);
+      });
+      sourceSel.value = state.filters.source;
+      q.value = state.filters.q || "";
+    }
+
+    function renderCompanies(main){
+      const wrap = document.createElement("div");
+      wrap.className = "card";
+
+      const companies = filteredCompanies();
+      const board = activeBoard();
+      const totalRoles = companies.reduce((acc, c) => acc + (c.roles?.length || 0), 0);
+      const matchedRoles = companies.reduce((acc, c) => acc + (c.roles || []).filter(roleMatchesFilter).length, 0);
+
+      const actions = document.createElement("div");
+      actions.className = "toolbarRow";
+
+      actions.appendChild(makeBtn(t().btnSelectVisible, "ghost", () => selectVisibleCompanies()));
+      actions.appendChild(makeBtn(t().btnClearSelected, "ghost", () => clearSelectedCompanies()));
+      actions.appendChild(makeBtn(t().btnAddSelectedToMyList, "secondary", () => addSelectedToPersonal()));
+      if(board.type === "personal"){
+        actions.appendChild(makeBtn(t().btnRemoveSelectedFromMyList, "secondary", () => removeSelectedFromPersonal()));
+        actions.appendChild(makeBtn(t().btnRemoveBoardFromMyList, "danger", () => removeBoardFromPersonal()));
+      }else{
+        actions.appendChild(makeBtn(t().btnAddVisibleToMyList, "secondary", () => addVisibleToPersonal()));
+        actions.appendChild(makeBtn(t().btnAddBoardToMyList, "success", () => addBoardToPersonal(board.id)));
+      }
+      actions.appendChild(makeBtn(t().btnImportDefaults, "ghost", mergeMissingDefaults));
+
+      const title = document.createElement("div");
+      title.className = "sectionTitle";
+      title.innerHTML = `
+        <div>
+          <h2>${t().showCompanies}</h2>
+          <div class="muted">${escapeHtml(t().companiesHint)}</div>
+          <div class="small" style="margin-top:6px">${escapeHtml(t().importDefaultsTip)}</div>
+        </div>
+        <div class="chips" id="companyChips"></div>
+      `;
+      wrap.appendChild(title);
+      wrap.appendChild(actions);
+
+      const chips = title.querySelector("#companyChips");
+      const chip1 = document.createElement("span");
+      chip1.className = "chip";
+      chip1.textContent = `${t().companiesCount} ${companies.length}`;
+      const chip2 = document.createElement("span");
+      chip2.className = "chip";
+      chip2.textContent = (state.filters.status === "all" && state.filters.source === "all")
+        ? `${t().roleCount} ${totalRoles}`
+        : `${t().matchedRoles} ${matchedRoles}`;
+      const chip3 = document.createElement("span");
+      chip3.className = "chip";
+      chip3.textContent = `${t().sourceLabel}: ${boardLabel(board.type === "personal" ? "personal" : board.id)}`;
+      const chip4 = document.createElement("span");
+      chip4.className = "chip";
+      chip4.textContent = `${t().companySelected} ${selectedSet().size}`;
+      chips.appendChild(chip1);
+      chips.appendChild(chip2);
+      chips.appendChild(chip3);
+      chips.appendChild(chip4);
+
+      if(companies.length === 0){
+        const empty = document.createElement("div");
+        empty.className = "muted";
+        empty.style.marginTop = "12px";
+        empty.textContent = t().empty;
+        wrap.appendChild(empty);
+      }else{
+        const list = document.createElement("div");
+        list.className = "list";
+        companies.forEach(c => list.appendChild(renderCompanyCard(c, board)));
+        wrap.appendChild(list);
+      }
+
+      main.appendChild(wrap);
+    }
+
+    function renderCompanyCard(company, board){
+      const div = document.createElement("div");
+      div.className = "company";
+
+      const roles = company.roles || [];
+      const matchedRoles = (state.filters.status === "all" && state.filters.source === "all" && !state.filters.q)
+        ? roles
+        : roles.filter(roleMatchesFilter);
+      const statusCounts = countByStatus(roles);
+      const activeCount = roles.filter(r => !["offer", "rejected"].includes(r.status)).length;
+      const inMyList = personalSet().has(company.id);
+
+      const metaBadges = [];
+      metaBadges.push(`<span class="badge">${t().roleCount} ${roles.length}</span>`);
+      if(activeCount > 0) metaBadges.push(`<span class="badge warn">${state.lang === "zh" ? "进行中" : "Active"} ${activeCount}</span>`);
+      if(statusCounts.offer > 0) metaBadges.push(`<span class="badge good">Offer ${statusCounts.offer}</span>`);
+      if(statusCounts.rejected > 0) metaBadges.push(`<span class="badge bad">${state.lang === "zh" ? "拒绝" : "Rejected"} ${statusCounts.rejected}</span>`);
+      if(inMyList) metaBadges.push(`<span class="badge good">${t().companyInMyList}</span>`);
+
+      const checked = selectedSet().has(company.id);
+
+      div.innerHTML = `
+        <div class="companyTop">
+          <div class="companyName">
+            <label class="companyCheck">
+              <input type="checkbox" data-act="selectCompany" ${checked ? "checked" : ""}/>
+              <span>${t().companySelected}</span>
+            </label>
+            <div class="zh">${escapeHtml(company.nameZh || "—")}</div>
+            <div class="en">${escapeHtml(company.nameEn || "")}</div>
+            <div class="small" style="margin-top:4px">${escapeHtml(t().sourceLabel)}：${escapeHtml(boardLabel(company.sourceBoardId))}</div>
+          </div>
+          <div class="companyMeta">${metaBadges.join("")}</div>
+          <div class="companyActions">
+            <button class="secondary" data-act="addRole">${t().btnAddRole}</button>
+            <button class="ghost" data-act="togglePersonal">${inMyList ? t().btnRemoveFromMyList : t().btnAddToMyList}</button>
+            <button class="ghost" data-act="edit">${t().btnEdit}</button>
+            <button class="ghost" data-act="delete">${t().btnDelete}</button>
+          </div>
+        </div>
+        ${(company.tags && company.tags.length) ? `<div class="chips">${company.tags.map(x => `<span class="chip">#${escapeHtml(x)}</span>`).join("")}</div>` : ""}
+        ${company.note ? `<div class="small" style="margin-top:8px">${escapeHtml(company.note)}</div>` : ""}
+        <div class="companyLinkRow">
+          ${company.officialUrl ? `<button class="secondary" data-act="official">${t().btnOfficial}</button>` : ""}
+          ${company.referralUrl ? `<button class="secondary" data-act="referral">${t().btnReferral}</button>` : ""}
+          ${(!company.officialUrl && !company.referralUrl) ? `<span class="small">${escapeHtml(t().noLink)}</span>` : ""}
+        </div>
+        <div class="posList" data-role-list></div>
+      `;
+
+      const selectBox = div.querySelector('[data-act="selectCompany"]');
+      if(selectBox) selectBox.addEventListener("change", e => toggleCompanySelection(company.id, e.target.checked));
+      div.querySelector('[data-act="addRole"]').addEventListener("click", () => openRoleModal(company.id));
+      div.querySelector('[data-act="togglePersonal"]').addEventListener("click", () => togglePersonal(company.id));
+      div.querySelector('[data-act="edit"]').addEventListener("click", () => openCompanyModal(company.id));
+      div.querySelector('[data-act="delete"]').addEventListener("click", () => deleteCompany(company.id));
+      const officialBtn = div.querySelector('[data-act="official"]');
+      if(officialBtn) officialBtn.addEventListener("click", () => window.open(company.officialUrl, "_blank", "noopener,noreferrer"));
+      const referralBtn = div.querySelector('[data-act="referral"]');
+      if(referralBtn) referralBtn.addEventListener("click", () => window.open(company.referralUrl, "_blank", "noopener,noreferrer"));
+
+      const roleList = div.querySelector('[data-role-list]');
+      if(matchedRoles.length === 0){
+        const m = document.createElement("div");
+        m.className = "small";
+        m.style.marginTop = "6px";
+        m.textContent = roles.length === 0 ? t().noRole : t().noRoleMatch;
+        roleList.appendChild(m);
+      }else{
+        matchedRoles.forEach(r => roleList.appendChild(renderRoleCard(company.id, r)));
+      }
+      return div;
+    }
+
+    function renderRoleCard(companyId, role){
+      const div = document.createElement("div");
+      div.className = "pos";
+      const statusBadge = statusBadgeHtml(role.status);
+      const srcBadge = sourceBadgeHtml(role.source);
+      const applied = role.appliedDate ? `${t().appliedDate}: ${escapeHtml(role.appliedDate)}` : "";
+      const extra = [applied].filter(Boolean).join(" · ");
+
+      div.innerHTML = `
+        <div class="posTop">
+          <div>
+            <div class="posTitle">${escapeHtml(role.title || "—")} ${statusBadge} ${srcBadge}</div>
+            <div class="posSub">${escapeHtml([role.location, role.salary].filter(Boolean).join(" · "))}${extra ? (" · " + extra) : ""}</div>
+            ${role.note ? `<div class="posSub">${escapeHtml(role.note)}</div>` : ""}
+          </div>
+          <div class="posActions">
+            ${role.link ? `<button class="secondary" data-act="open">${t().btnViewLink}</button>` : ""}
+            <button class="ghost" data-act="edit">${t().btnEdit}</button>
+            <button class="ghost" data-act="delete">${t().btnDelete}</button>
+          </div>
+        </div>
+
+        <div class="posGrid">
+          <div>
+            <label>${t().statusNow}</label>
+            <select data-field="status"></select>
+          </div>
+          <div>
+            <label>${t().sourceNow}</label>
+            <select data-field="source"></select>
+          </div>
+          <div>
+            <label>${t().location}</label>
+            <input data-field="location" type="text" value="${escapeAttr(role.location || "")}"/>
+          </div>
+          <div>
+            <label>${t().salary}</label>
+            <input data-field="salary" type="text" value="${escapeAttr(role.salary || "")}"/>
+          </div>
+          <div>
+            <label>${t().appliedDate}</label>
+            <input data-field="appliedDate" type="date" value="${escapeAttr(role.appliedDate || "")}"/>
+          </div>
+        </div>
+      `;
+
+      const statusSel = div.querySelector('select[data-field="status"]');
+      STATUS.filter(s => s.key !== "all").forEach(s => {
+        const opt = document.createElement("option");
+        opt.value = s.key;
+        opt.textContent = s[state.lang];
+        statusSel.appendChild(opt);
+      });
+      statusSel.value = role.status || "interested";
+
+      const srcSel = div.querySelector('select[data-field="source"]');
+      SOURCE.filter(s => s.key !== "all").forEach(s => {
+        const opt = document.createElement("option");
+        opt.value = s.key;
+        opt.textContent = s[state.lang];
+        srcSel.appendChild(opt);
+      });
+      srcSel.value = role.source || "official";
+
+      const onChange = () => {
+        const company = state.companies.find(c => c.id === companyId);
+        if(!company) return;
+        const r = (company.roles || []).find(x => x.id === role.id);
+        if(!r) return;
+        r.status = statusSel.value;
+        r.source = srcSel.value;
+        r.location = div.querySelector('input[data-field="location"]').value.trim();
+        r.salary = div.querySelector('input[data-field="salary"]').value.trim();
+        r.appliedDate = div.querySelector('input[data-field="appliedDate"]').value;
+        r.updatedAt = new Date().toISOString();
+        scheduleSave();
+        render();
+      };
+
+      statusSel.addEventListener("change", onChange);
+      srcSel.addEventListener("change", onChange);
+      div.querySelectorAll('input[data-field]').forEach(inp => inp.addEventListener("change", onChange));
+
+      const openBtn = div.querySelector('[data-act="open"]');
+      if(openBtn) openBtn.addEventListener("click", () => window.open(role.link, "_blank", "noopener,noreferrer"));
+      div.querySelector('[data-act="edit"]').addEventListener("click", () => openRoleModal(companyId, role.id));
+      div.querySelector('[data-act="delete"]').addEventListener("click", () => deleteRole(companyId, role.id));
+      return div;
+    }
+
+    function renderDashboard(main){
+      const wrap = document.createElement("div");
+      wrap.className = "card";
+      const title = document.createElement("div");
+      title.className = "sectionTitle";
+      title.innerHTML = `
+        <div>
+          <h2>${t().showDash}</h2>
+          <div class="muted">${escapeHtml(t().dashboardHint)}</div>
+        </div>
+      `;
+      wrap.appendChild(title);
+
+      const allCompanies = state.companies;
+      const allRoles = allCompanies.flatMap(c => c.roles || []);
+      const official = allRoles.filter(r => r.source === "official").length;
+      const active = allRoles.filter(r => !["offer", "rejected"].includes(r.status)).length;
+
+      const grid = document.createElement("div");
+      grid.className = "dashGrid";
+
+      const left = document.createElement("div");
+      left.className = "card";
+      left.style.padding = "14px";
+      left.style.background = "rgba(10,14,28,.45)";
+      left.style.borderRadius = "18px";
+      left.style.border = "1px solid rgba(34,48,91,.95)";
+      left.innerHTML = `
+        <div class="kpis">
+          <div class="kpi"><div class="label">${t().dashKpiRoles}</div><div class="value">${allRoles.length}</div></div>
+          <div class="kpi"><div class="label">${t().dashKpiCompanies}</div><div class="value">${allCompanies.length}</div></div>
+          <div class="kpi"><div class="label">${t().dashKpiOfficial}</div><div class="value">${official}</div></div>
+          <div class="kpi"><div class="label">${t().dashKpiActive}</div><div class="value">${active}</div></div>
+        </div>
+      `;
+
+      const right = document.createElement("div");
+      right.className = "card";
+      right.style.padding = "14px";
+      right.style.background = "rgba(10,14,28,.45)";
+      right.style.borderRadius = "18px";
+      right.style.border = "1px solid rgba(34,48,91,.95)";
+
+      const chartTitle = document.createElement("div");
+      chartTitle.className = "navTitle";
+      chartTitle.textContent = t().dashChartTitle;
+      right.appendChild(chartTitle);
+
+      const canvas = document.createElement("canvas");
+      canvas.style.width = "100%";
+      canvas.style.height = "260px";
+      canvas.height = 260;
+      right.appendChild(canvas);
+
+      const legendTitle = document.createElement("div");
+      legendTitle.className = "navTitle";
+      legendTitle.style.marginTop = "10px";
+      legendTitle.textContent = t().dashLegend;
+      right.appendChild(legendTitle);
+
+      const legend = document.createElement("div");
+      legend.className = "legend";
+      right.appendChild(legend);
+
+      grid.appendChild(left);
+      grid.appendChild(right);
+      wrap.appendChild(grid);
+      main.appendChild(wrap);
+
+      const counts = countByStatus(allRoles);
+      drawDonut(canvas, counts);
+
+      legend.innerHTML = "";
+      const showKeys = ["interested","applied","oa","hr","interview","offer","rejected","hold"];
+      showKeys.forEach(k => {
+        const n = counts[k] || 0;
+        const item = document.createElement("div");
+        item.className = "legendItem";
+        item.innerHTML = `
+          <div class="legendLeft">
+            <div class="dot" style="background:${escapeAttr(statusColorVar(k))}"></div>
+            <span>${escapeHtml(statusLabel(k))}</span>
+          </div>
+          <div class="legendRight">${n}</div>
+        `;
+        legend.appendChild(item);
+      });
+
+      window.requestAnimationFrame(() => {
+        if(canvas._ro) canvas._ro.disconnect();
+        const ro = new ResizeObserver(() => drawDonut(canvas, counts));
+        ro.observe(canvas);
+        canvas._ro = ro;
+      });
+    }
+
+    function renderJd(main){
+      const wrap = document.createElement("div");
+      wrap.className = "card";
+      wrap.innerHTML = `
+        <div class="sectionTitle">
+          <div>
+            <h2>${t().showJd}</h2>
+            <div class="muted">${escapeHtml(t().jdHint)}</div>
+          </div>
+          <div class="chips"><span class="chip">${t().labelCount} ${state.jd.length}</span></div>
+        </div>
+      `;
+
+      if(state.jd.length === 0){
+        const empty = document.createElement("div");
+        empty.className = "muted";
+        empty.textContent = t().noJd;
+        wrap.appendChild(empty);
+      }else{
+        const q = normalize(state.filters.q);
+        const jdItems = state.jd.filter(j => {
+          if(!q) return true;
+          const hay = normalize([j.title, j.company, (j.tags || []).join(" "), j.notes, j.url].join(" "));
+          return hay.includes(q);
+        });
+
+        if(jdItems.length === 0){
+          const empty = document.createElement("div");
+          empty.className = "muted";
+          empty.textContent = t().noJdMatch;
+          wrap.appendChild(empty);
+        }else{
+          const list = document.createElement("div");
+          list.className = "jdList";
+          jdItems.forEach(j => list.appendChild(renderJdCard(j)));
+          wrap.appendChild(list);
+        }
+      }
+      main.appendChild(wrap);
+    }
+
+    function renderJdCard(jd){
+      const div = document.createElement("div");
+      div.className = "jd";
+      const tags = (jd.tags || []).filter(Boolean);
+      div.innerHTML = `
+        <div class="jdTop">
+          <div>
+            <div class="jdTitle">${escapeHtml(jd.title || "—")}</div>
+            <div class="jdSub">${escapeHtml([jd.company].filter(Boolean).join(" · "))}</div>
+            ${jd.url ? `<div class="jdSub"><a href="${escapeAttr(jd.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(jd.url)}</a></div>` : ""}
+          </div>
+          <div class="jdActions">
+            <button class="ghost" data-act="edit">${t().btnEdit}</button>
+            <button class="ghost" data-act="delete">${t().btnDelete}</button>
+          </div>
+        </div>
+        ${tags.length ? `<div class="jdTags">${tags.map(x => `<span class="chip">#${escapeHtml(x)}</span>`).join("")}</div>` : ""}
+        ${jd.notes ? `<div class="small" style="margin-top:8px">${escapeHtml(jd.notes)}</div>` : ""}
+      `;
+      div.querySelector('[data-act="edit"]').addEventListener("click", () => openJdModal(jd.id));
+      div.querySelector('[data-act="delete"]').addEventListener("click", () => deleteJd(jd.id));
+      return div;
+    }
+
+    function countByStatus(roles){
+      const out = {};
+      roles.forEach(r => { const k = r.status || "interested"; out[k] = (out[k] || 0) + 1; });
+      ["interested","applied","oa","hr","interview","offer","rejected","hold"].forEach(k => out[k] = out[k] || 0);
+      return out;
+    }
+
+    function drawDonut(canvas, counts){
+      const ctx = canvas.getContext("2d");
+      const rect = canvas.getBoundingClientRect();
+      const dpr = Math.max(1, window.devicePixelRatio || 1);
+      const w = Math.floor(rect.width * dpr);
+      const h = Math.floor(260 * dpr);
+      canvas.width = w;
+      canvas.height = h;
+      ctx.clearRect(0,0,w,h);
+
+      const keys = ["interested","applied","oa","hr","interview","offer","rejected","hold"];
+      const total = keys.reduce((a,k)=>a+(counts[k]||0),0);
+      const cx = w / 2, cy = h / 2;
+      const R = Math.min(w,h) * 0.33;
+      const r = R * 0.62;
+
+      ctx.beginPath();
+      ctx.arc(cx, cy, R, 0, Math.PI * 2);
+      ctx.arc(cx, cy, r, 0, Math.PI * 2, true);
+      ctx.closePath();
+      ctx.fillStyle = "rgba(34,48,91,.35)";
+      ctx.fill("evenodd");
+
+      if(total === 0){
+        ctx.fillStyle = "rgba(233,236,255,.55)";
+        ctx.font = `${Math.floor(14*dpr)}px ${getComputedStyle(document.body).fontFamily}`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(t().noRoleData, cx, cy);
+        return;
+      }
+
+      let start = -Math.PI / 2;
+      keys.forEach(k => {
+        const val = counts[k] || 0;
+        if(val <= 0) return;
+        const ang = (val / total) * Math.PI * 2;
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.arc(cx, cy, R, start, start + ang);
+        ctx.closePath();
+        ctx.fillStyle = statusColorVar(k);
+        ctx.globalAlpha = .95;
+        ctx.fill();
+        start += ang;
+      });
+
+      ctx.globalAlpha = 1;
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(10,14,28,.92)";
+      ctx.fill();
+
+      ctx.fillStyle = "rgba(233,236,255,.9)";
+      ctx.font = `${Math.floor(20*dpr)}px ${getComputedStyle(document.body).fontFamily}`;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(String(total), cx, cy - 6*dpr);
+      ctx.fillStyle = "rgba(233,236,255,.55)";
+      ctx.font = `${Math.floor(12*dpr)}px ${getComputedStyle(document.body).fontFamily}`;
+      ctx.fillText(t().totalRolesLabel, cx, cy + 16*dpr);
+    }
+
+    function statusBadgeHtml(status){
+      if(!status || status === "all") return "";
+      const cls = status === "offer" ? "good" : status === "rejected" ? "bad" : status === "hold" ? "warn" : "";
+      return `<span class="badge ${cls}">${escapeHtml(statusLabel(status))}</span>`;
+    }
+    function sourceBadgeHtml(source){
+      if(!source || source === "all") return "";
+      return `<span class="badge">${escapeHtml(sourceLabel(source))}</span>`;
+    }
+
+    function openModal({ title, bodyNodes, footerButtons }){
+      $("#modalTitle").textContent = title;
+      const body = $("#modalBody");
+      const foot = $("#modalFooter");
+      body.innerHTML = "";
+      foot.innerHTML = "";
+      bodyNodes.forEach(n => body.appendChild(n));
+      footerButtons.forEach(b => foot.appendChild(b));
+      $("#modalBackdrop").style.display = "flex";
+    }
+    function closeModal(){
+      $("#modalBackdrop").style.display = "none";
+      $("#modalBody").innerHTML = "";
+      $("#modalFooter").innerHTML = "";
+    }
+
+    function field(labelText, type, value){
+      const wrap = document.createElement("div");
+      const label = document.createElement("label");
+      label.textContent = labelText;
+      const input = document.createElement("input");
+      input.type = type;
+      input.value = value || "";
+      wrap.appendChild(label);
+      wrap.appendChild(input);
+      return { wrap, input };
+    }
+    function textareaField(labelText, value){
+      const wrap = document.createElement("div");
+      const label = document.createElement("label");
+      label.textContent = labelText;
+      const input = document.createElement("textarea");
+      input.value = value || "";
+      wrap.appendChild(label);
+      wrap.appendChild(input);
+      return { wrap, input };
+    }
+    function selectField(labelText, options, value){
+      const wrap = document.createElement("div");
+      const label = document.createElement("label");
+      label.textContent = labelText;
+      const select = document.createElement("select");
+      options.forEach(o => {
+        const opt = document.createElement("option");
+        opt.value = o.value;
+        opt.textContent = o.label;
+        select.appendChild(opt);
+      });
+      select.value = value;
+      wrap.appendChild(label);
+      wrap.appendChild(select);
+      return { wrap, select };
+    }
+    function checkboxField(labelText, checked=false){
+      const wrap = document.createElement("div");
+      wrap.style.display = "flex";
+      wrap.style.alignItems = "center";
+      wrap.style.gap = "10px";
+      wrap.style.padding = "2px 0";
+      const input = document.createElement("input");
+      input.type = "checkbox";
+      input.checked = checked;
+      input.style.width = "18px";
+      input.style.height = "18px";
+      const label = document.createElement("label");
+      label.style.margin = "0";
+      label.textContent = labelText;
+      wrap.appendChild(input);
+      wrap.appendChild(label);
+      return { wrap, input };
+    }
+    function makeBtn(text, cls, onClick){
+      const b = document.createElement("button");
+      if(cls) b.className = cls;
+      b.type = "button";
+      b.textContent = text;
+      b.addEventListener("click", onClick);
+      return b;
+    }
+
+    function openCompanyModal(companyId=null){
+      const editing = !!companyId;
+      const company = editing ? state.companies.find(c => c.id === companyId) : null;
+      const fZh = field(t().companyZh, "text", company?.nameZh || "");
+      const fEn = field(t().companyEn, "text", company?.nameEn || "");
+      const fOfficial = field(t().officialUrl, "url", company?.officialUrl || "");
+      const fReferral = field(t().referralUrl, "url", company?.referralUrl || "");
+      const fTags = field(t().tags, "text", (company?.tags || []).join(", "));
+      const fNote = textareaField(t().companyNote, company?.note || "");
+      const boardSel = selectField(t().sourceBoard,
+        state.boards.filter(b => b.type === "source").map(b => ({ value:b.id, label: state.lang === "zh" ? b.zh : b.en })),
+        company?.sourceBoardId || state.boards.find(b => b.type === "source")?.id || "global500"
+      );
+      const personalCheck = checkboxField(t().btnAddToMyList, company ? personalSet().has(company.id) : activeBoard().type === "personal");
+
+      const bodyNodes = [fZh.wrap, fEn.wrap, boardSel.wrap, fOfficial.wrap, fReferral.wrap, fTags.wrap, fNote.wrap, personalCheck.wrap];
+      const btnCancel = makeBtn(t().btnCancel, "secondary", closeModal);
+      const btnSave = makeBtn(t().btnSave, "", () => {
+        const nameZh = fZh.input.value.trim();
+        const nameEn = fEn.input.value.trim();
+        if(!nameZh && !nameEn){ toast(t().ensureName); return; }
+        const tags = fTags.input.value.split(",").map(x => x.trim()).filter(Boolean);
+        const payload = {
+          id: company?.id || uid(),
+          nameZh,
+          nameEn,
+          sourceBoardId: boardSel.select.value,
+          officialUrl: fOfficial.input.value.trim(),
+          referralUrl: fReferral.input.value.trim(),
+          tags,
+          note: fNote.input.value.trim(),
+          roles: company?.roles || []
+        };
+
+        if(editing){
+          const idx = state.companies.findIndex(c => c.id === companyId);
+          if(idx >= 0) state.companies[idx] = payload;
+        }else{
+          state.companies.unshift(payload);
+        }
+
+        setPersonal(payload.id, personalCheck.input.checked);
+        if(activeBoard().type !== "personal") state.activeBoardId = payload.sourceBoardId;
+        scheduleSave();
+        closeModal();
+        render();
+      });
+
+      openModal({
+        title: editing ? t().modalEditCompany : t().modalAddCompany,
+        bodyNodes,
+        footerButtons:[btnCancel, btnSave]
+      });
+    }
+
+    function openRoleModal(companyId, roleId=null){
+      const company = state.companies.find(c => c.id === companyId);
+      if(!company) return;
+      const editing = !!roleId;
+      const role = editing ? (company.roles || []).find(r => r.id === roleId) : null;
+      const fTitle = field(t().roleTitle, "text", role?.title || "");
+      const fLoc = field(t().location, "text", role?.location || "");
+      const fSal = field(t().salary, "text", role?.salary || "");
+      const fLink = field(t().link, "url", role?.link || "");
+      const fDate = field(t().appliedDate, "date", role?.appliedDate || "");
+      const fNote = textareaField(t().note, role?.note || "");
+      const statusSel = selectField(t().statusNow, STATUS.filter(s=>s.key!=="all").map(s=>({value:s.key,label:s[state.lang]})), role?.status || "interested");
+      const sourceSel = selectField(t().sourceNow, SOURCE.filter(s=>s.key!=="all").map(s=>({value:s.key,label:s[state.lang]})), role?.source || "official");
+
+      const btnCancel = makeBtn(t().btnCancel, "secondary", closeModal);
+      const btnSave = makeBtn(t().btnSave, "", () => {
+        const title = fTitle.input.value.trim();
+        if(!title){ toast(t().roleRequired); return; }
+        const payload = {
+          id: role?.id || uid(),
+          title,
+          location: fLoc.input.value.trim(),
+          salary: fSal.input.value.trim(),
+          link: fLink.input.value.trim(),
+          note: fNote.input.value.trim(),
+          appliedDate: fDate.input.value,
+          status: statusSel.select.value,
+          source: sourceSel.select.value,
+          createdAt: role?.createdAt || new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        };
+        company.roles = company.roles || [];
+        if(editing){
+          const idx = company.roles.findIndex(r => r.id === roleId);
+          if(idx >= 0) company.roles[idx] = payload;
+        }else{
+          company.roles.unshift(payload);
+        }
+        scheduleSave();
+        closeModal();
+        render();
+      });
+
+      openModal({
+        title: editing ? t().modalEditRole : `${t().modalAddRolePrefix}${company.nameZh || company.nameEn}`,
+        bodyNodes:[fTitle.wrap, statusSel.wrap, sourceSel.wrap, fLoc.wrap, fSal.wrap, fDate.wrap, fLink.wrap, fNote.wrap],
+        footerButtons:[btnCancel, btnSave]
+      });
+    }
+
+    function openJdModal(jdId=null){
+      const editing = !!jdId;
+      const jd = editing ? state.jd.find(x => x.id === jdId) : null;
+      const fTitle = field(t().jdTitle, "text", jd?.title || "");
+      const fCompany = field(t().jdCompany, "text", jd?.company || "");
+      const fUrl = field(t().jdUrl, "url", jd?.url || "");
+      const fTags = field(t().jdTags, "text", (jd?.tags || []).join(", "));
+      const fNotes = textareaField(t().jdNotes, jd?.notes || "");
+      const btnCancel = makeBtn(t().btnCancel, "secondary", closeModal);
+      const btnSave = makeBtn(t().btnSave, "", () => {
+        const title = fTitle.input.value.trim();
+        if(!title){ toast(t().jdRequired); return; }
+        const payload = {
+          id: jd?.id || uid(),
+          title,
+          company: fCompany.input.value.trim(),
+          url: fUrl.input.value.trim(),
+          tags: fTags.input.value.split(",").map(x => x.trim()).filter(Boolean),
+          notes: fNotes.input.value.trim(),
+          createdAt: jd?.createdAt || new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        };
+        if(editing){
+          const idx = state.jd.findIndex(x => x.id === jdId);
+          if(idx >= 0) state.jd[idx] = payload;
+        }else{
+          state.jd.unshift(payload);
+        }
+        scheduleSave();
+        closeModal();
+        render();
+      });
+      openModal({
+        title: editing ? t().modalEditJd : t().modalAddJd,
+        bodyNodes:[fTitle.wrap, fCompany.wrap, fUrl.wrap, fTags.wrap, fNotes.wrap],
+        footerButtons:[btnCancel, btnSave]
+      });
+    }
+
+    function setPersonal(companyId, yes){
+      const set = new Set(state.personalCompanyIds || []);
+      if(yes) set.add(companyId); else set.delete(companyId);
+      state.personalCompanyIds = Array.from(set);
+    }
+
+    function setSelectedCompany(companyId, yes){
+      const set = new Set(state.ui.selectedCompanyIds || []);
+      if(yes) set.add(companyId); else set.delete(companyId);
+      state.ui.selectedCompanyIds = Array.from(set);
+    }
+    function toggleCompanySelection(companyId, yes){
+      setSelectedCompany(companyId, yes);
+      scheduleSave();
+      render();
+    }
+    function selectVisibleCompanies(){
+      filteredCompanies().forEach(c => setSelectedCompany(c.id, true));
+      scheduleSave();
+      render();
+    }
+    function clearSelectedCompanies(){
+      state.ui.selectedCompanyIds = [];
+      scheduleSave();
+      render();
+    }
+    function addSelectedToPersonal(){
+      const ids = Array.from(selectedSet());
+      if(!ids.length){ toast(t().noSelectedCompany); return; }
+      ids.forEach(id => setPersonal(id, true));
+      scheduleSave();
+      toast(t().toastBulkAdded);
+      render();
+    }
+    function removeSelectedFromPersonal(){
+      const ids = Array.from(selectedSet());
+      if(!ids.length){ toast(t().noSelectedCompany); return; }
+      ids.forEach(id => setPersonal(id, false));
+      scheduleSave();
+      toast(t().toastBulkRemoved);
+      render();
+    }
+    function togglePersonal(companyId){
+      const yes = !personalSet().has(companyId);
+      setPersonal(companyId, yes);
+      scheduleSave();
+      toast(yes ? t().toastAddedMyList : t().toastRemovedMyList);
+      render();
+    }
+    function addBoardToPersonal(boardId){
+      state.companies.filter(c => c.sourceBoardId === boardId).forEach(c => setPersonal(c.id, true));
+      scheduleSave();
+      toast(t().toastBulkAdded);
+      render();
+    }
+    function addVisibleToPersonal(){
+      filteredCompanies().forEach(c => setPersonal(c.id, true));
+      scheduleSave();
+      toast(t().toastBulkAdded);
+      render();
+    }
+    function removeVisibleFromPersonal(){
+      filteredCompanies().forEach(c => setPersonal(c.id, false));
+      scheduleSave();
+      toast(t().toastBulkRemoved);
+      render();
+    }
+    function removeBoardFromPersonal(){
+      companiesInActiveBoard().forEach(c => setPersonal(c.id, false));
+      scheduleSave();
+      toast(t().toastBulkRemoved);
+      render();
+    }
+
+    function mergeMissingDefaults(){
+      state.companies = enrichCompaniesWithDefaultLinks(state.companies);
+      const defaults = defaultCompanies();
+      const existing = new Set(state.companies.map(c => `${normalize(c.nameZh)}|${normalize(c.nameEn)}|${c.sourceBoardId}`));
+      defaults.forEach(c => {
+        const key = `${normalize(c.nameZh)}|${normalize(c.nameEn)}|${c.sourceBoardId}`;
+        if(!existing.has(key)){
+          state.companies.push(c);
+          existing.add(key);
+        }
+      });
+      scheduleSave();
+      toast(t().toastMergedDefaults);
+      render();
+    }
+
+    function deleteCompany(companyId){
+      const c = state.companies.find(x => x.id === companyId);
+      const name = c ? (c.nameZh || c.nameEn) : "";
+      if(!confirm(t().confirmDeleteCompany + name + " ?")) return;
+      state.companies = state.companies.filter(c => c.id !== companyId);
+      setPersonal(companyId, false);
+      setSelectedCompany(companyId, false);
+      scheduleSave();
+      render();
+    }
+    function deleteRole(companyId, roleId){
+      if(!confirm(t().confirmDeleteRole)) return;
+      const c = state.companies.find(x => x.id === companyId);
+      if(!c) return;
+      c.roles = (c.roles || []).filter(r => r.id !== roleId);
+      scheduleSave();
+      render();
+    }
+    function deleteJd(jdId){
+      if(!confirm(t().confirmDeleteJd)) return;
+      state.jd = state.jd.filter(x => x.id !== jdId);
+      scheduleSave();
+      render();
+    }
+
+    function exportJSON(){
+      const data = JSON.stringify(state, null, 2);
+      const blob = new Blob([data], {type:"application/json"});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `job-hunting-${nowISO()}.json`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      toast(t().toastExported);
+    }
+
+    function importJSONFile(file){
+      const reader = new FileReader();
+      reader.onload = () => {
+        try{
+          const parsed = JSON.parse(reader.result);
+          state = migrateState(parsed);
+          saveState(false);
+          toast(t().toastImported);
+          render();
+        }catch(e){
+          toast(t().toastImportFail);
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function resetAll(){
+      if(!confirm(t().confirmReset)) return;
+      state = defaultState();
+      saveState(false);
+      toast(t().toastReset);
+      render();
+    }
+
+    function escapeHtml(s){
+      return String(s || "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+    }
+    function escapeAttr(s){
+      return escapeHtml(s).replaceAll("\n", " ");
+    }
+
+    function bind(){
+      $$(".tab").forEach(el => {
+        el.addEventListener("click", () => {
+          state.activeTab = el.dataset.tab;
+          scheduleSave();
+          render();
+        });
+      });
+
+      $("#langBtn").addEventListener("click", () => {
+        state.lang = state.lang === "zh" ? "en" : "zh";
+        scheduleSave();
+        render();
+      });
+
+      $("#subToggle").addEventListener("click", () => {
+        const wrap = $("#subWrap");
+        wrap.classList.toggle("collapsed");
+        $("#subToggle").textContent = wrap.classList.contains("collapsed") ? t().toggleDescOpen : t().toggleDescClose;
+      });
+
+      $("#sideCollapseBtn").addEventListener("click", toggleSide);
+
+      $("#statusFilter").addEventListener("change", e => {
+        state.filters.status = e.target.value;
+        scheduleSave();
+        render();
+      });
+      $("#sourceFilter").addEventListener("change", e => {
+        state.filters.source = e.target.value;
+        scheduleSave();
+        render();
+      });
+      $("#searchInput").addEventListener("input", e => {
+        state.filters.q = e.target.value;
+        scheduleSave();
+        render();
+      });
+
+      $("#exportBtn").addEventListener("click", exportJSON);
+      $("#importBtn").addEventListener("click", () => $("#importFile").click());
+      if($("#restoreDefaultsBtn")) $("#restoreDefaultsBtn").addEventListener("click", mergeMissingDefaults);
+      $("#importFile").addEventListener("change", e => {
+        const f = e.target.files && e.target.files[0];
+        if(f) importJSONFile(f);
+        e.target.value = "";
+      });
+
+      $("#addCompanyBtn").addEventListener("click", () => openCompanyModal(null));
+      $("#addJdBtn").addEventListener("click", () => openJdModal(null));
+      $("#resetBtn").addEventListener("click", resetAll);
+
+      $("#modalCloseBtn").addEventListener("click", closeModal);
+      $("#modalBackdrop").addEventListener("click", e => {
+        if(e.target.id === "modalBackdrop") closeModal();
+      });
+      window.addEventListener("keydown", e => {
+        if(e.key === "Escape") closeModal();
+      });
+      window.addEventListener("resize", () => {
+        syncSideCollapseUI();
+      });
+    }
+
+    bind();
+    render();
+  </script>
+</body>
+</html>
