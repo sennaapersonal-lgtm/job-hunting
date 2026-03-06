@@ -9,16 +9,17 @@
     :root{
       --bg:#070a14;
       --text:#e9ecff;
-      --muted:rgba(233,236,255,.68);
-      --muted2:rgba(233,236,255,.42);
+      --muted:rgba(233,236,255,.70);
+      --muted2:rgba(233,236,255,.46);
       --line:#22305b;
       --accent:#7aa2ff;
       --good:#3ddc97;
       --warn:#ffd166;
       --bad:#ff6b6b;
+
       --shadow: 0 12px 40px rgba(0,0,0,.42);
       --radius:18px;
-      --radius2:14px;
+
       --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, "Noto Sans", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
       --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 
@@ -38,6 +39,8 @@
       min-height:100dvh;
       overflow-x:hidden;
       -webkit-text-size-adjust: 100%;
+      line-height: 1.55;
+      letter-spacing: .1px;
     }
     a{color:inherit; text-decoration:none}
     button{font-family:inherit}
@@ -62,14 +65,14 @@
       margin-bottom:12px;
     }
     .hero{min-width: 260px; flex: 1 1 520px;}
-    h1{margin:0;font-size:26px;letter-spacing:.2px}
+    h1{margin:0;font-size:24px;letter-spacing:.2px; line-height:1.18}
 
     .subWrap{margin-top:8px; position:relative;}
     .sub{
       color:var(--muted);
       font-size:13px;
-      line-height:1.45;
-      max-width:960px;
+      line-height:1.5;
+      max-width:980px;
       white-space:pre-wrap;
     }
     .subToggle{
@@ -78,6 +81,7 @@
       padding:8px 10px;
       border-radius:12px;
       font-size:12px;
+      line-height:1.2;
     }
 
     .pills{
@@ -92,6 +96,7 @@
       border:1px solid rgba(122,162,255,.25);
       background: rgba(122,162,255,.10);
       font-size:12px; color:#dbe6ff; white-space:nowrap;
+      line-height:1.2;
     }
     .pill.good{border-color:rgba(61,220,151,.25);background:rgba(61,220,151,.10)}
     .pill.warn{border-color:rgba(255,209,102,.25);background:rgba(255,209,102,.10)}
@@ -113,9 +118,10 @@
       padding:10px 12px;
       border-radius:12px;
       cursor:pointer;
-      box-shadow: 0 8px 18px rgba(0,0,0,.25);
-      font-weight:800;
+      box-shadow: 0 8px 18px rgba(0,0,0,.22);
+      font-weight:850;
       font-size:13px;
+      line-height:1.15;
       transition: transform .06s ease, border-color .15s ease, opacity .15s ease;
       user-select:none;
       display:inline-flex;
@@ -138,11 +144,13 @@
     /* Top tabs (sticky on mobile) */
     .tabsBar{ margin: 10px 0 12px; }
     .navTitle{
-      font-size:12px;
+      font-size:11px;
       color:var(--muted2);
       font-weight:900;
-      letter-spacing:.45px;
+      letter-spacing:.55px;
       margin: 0 0 10px;
+      line-height:1.2;
+      text-transform: none;
     }
     .tabs{
       display:flex;
@@ -159,6 +167,7 @@
       user-select:none;
       font-weight:900;
       font-size:13px;
+      line-height:1.15;
     }
     .tab.active{
       border-color:rgba(122,162,255,.45);
@@ -190,6 +199,15 @@
       height: fit-content;
     }
 
+    /* Side collapse header */
+    .sideHead{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom:10px;
+    }
+
     /* Forms */
     input[type="text"], input[type="url"], input[type="date"], input[type="number"], textarea, select{
       width:100%;
@@ -200,14 +218,22 @@
       border-radius:12px;
       outline:none;
       font-size:13px;
+      line-height:1.25;
     }
-    textarea{min-height:110px; resize:vertical; line-height:1.4}
-    label{display:block;font-size:12px;color:var(--muted); margin:0 0 6px 2px; font-weight:900}
+    textarea{min-height:110px; resize:vertical; line-height:1.45}
+    label{
+      display:block;
+      font-size:12px;
+      color:var(--muted);
+      margin:0 0 6px 2px;
+      font-weight:900;
+      line-height:1.2;
+    }
     .row{display:flex; gap:10px; flex-wrap:wrap}
     .row > *{flex:1}
-    .hint{font-size:12px; color:var(--muted2); line-height:1.35}
-    .muted{color:var(--muted); font-size:12px; line-height:1.4}
-    .small{font-size:12px;color:var(--muted2)}
+    .hint{font-size:12px; color:var(--muted2); line-height:1.4}
+    .muted{color:var(--muted); font-size:12px; line-height:1.45}
+    .small{font-size:12px;color:var(--muted2); line-height:1.4}
     .mono{font-family:var(--mono)}
 
     /* Side boards */
@@ -221,12 +247,12 @@
       user-select:none;
     }
     .boardBtn.active{border-color:rgba(122,162,255,.45); background: rgba(122,162,255,.10)}
-    .boardBtn .name{font-weight:900; font-size:13px}
+    .boardBtn .name{font-weight:900; font-size:13px; line-height:1.2}
     .boardBtn .desc{margin-top:4px;color:var(--muted2);font-size:12px;line-height:1.35}
 
     /* Company cards */
     .sectionTitle{display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:10px}
-    .sectionTitle h2{margin:0;font-size:16px;letter-spacing:.2px}
+    .sectionTitle h2{margin:0;font-size:16px;letter-spacing:.2px; line-height:1.25}
     .chips{display:flex; gap:8px; flex-wrap:wrap; align-items:center}
     .chip{
       padding:6px 10px;
@@ -235,6 +261,7 @@
       background: rgba(10,14,28,.55);
       font-size:12px;
       color:var(--muted);
+      line-height:1.2;
     }
 
     .list{display:grid; gap:12px}
@@ -252,8 +279,8 @@
       display:flex; flex-direction:column; gap:2px;
       min-width: 220px;
     }
-    .companyName .zh{font-weight:950; font-size:15px}
-    .companyName .en{color:var(--muted2); font-size:12px}
+    .companyName .zh{font-weight:950; font-size:15px; line-height:1.2}
+    .companyName .en{color:var(--muted2); font-size:12px; line-height:1.25}
     .companyMeta{display:flex; gap:8px; flex-wrap:wrap; align-items:center}
     .badge{
       padding:6px 10px;
@@ -263,6 +290,7 @@
       background: rgba(122,162,255,.10);
       color:#dbe6ff;
       white-space:nowrap;
+      line-height:1.2;
     }
     .badge.good{border-color:rgba(61,220,151,.25); background: rgba(61,220,151,.10)}
     .badge.warn{border-color:rgba(255,209,102,.25); background: rgba(255,209,102,.10)}
@@ -283,8 +311,8 @@
       justify-content:space-between;
       flex-wrap:wrap;
     }
-    .posTitle{font-weight:900; font-size:13px}
-    .posSub{color:var(--muted2); font-size:12px; margin-top:4px; line-height:1.35}
+    .posTitle{font-weight:900; font-size:13px; line-height:1.25}
+    .posSub{color:var(--muted2); font-size:12px; margin-top:4px; line-height:1.4}
     .posGrid{
       margin-top:10px;
       display:grid;
@@ -313,13 +341,13 @@
       border-radius: 16px;
       padding:12px;
     }
-    .kpi .label{color:var(--muted2); font-size:12px; font-weight:900}
-    .kpi .value{font-size:22px; font-weight:950; margin-top:6px}
+    .kpi .label{color:var(--muted2); font-size:12px; font-weight:900; line-height:1.2}
+    .kpi .value{font-size:22px; font-weight:950; margin-top:6px; line-height:1.1}
     .legend{display:grid; gap:8px; margin-top:10px}
     .legendItem{display:flex; gap:10px; align-items:center; justify-content:space-between}
     .dot{width:10px; height:10px; border-radius:999px; background: var(--accent)}
     .legendLeft{display:flex; gap:10px; align-items:center}
-    .legendLeft span{font-size:12px; color:var(--muted)}
+    .legendLeft span{font-size:12px; color:var(--muted); line-height:1.2}
     .legendRight{font-size:12px; color:var(--muted2); font-family:var(--mono)}
 
     /* JD */
@@ -331,7 +359,7 @@
       padding:12px;
     }
     .jdTop{display:flex; gap:10px; align-items:flex-start; justify-content:space-between; flex-wrap:wrap}
-    .jdTitle{font-weight:950; font-size:14px}
+    .jdTitle{font-weight:950; font-size:14px; line-height:1.25}
     .jdSub{color:var(--muted2); font-size:12px; margin-top:4px; line-height:1.35}
     .jdActions{display:flex; gap:8px; flex-wrap:wrap; align-items:center}
     .jdTags{display:flex; gap:8px; flex-wrap:wrap; margin-top:8px}
@@ -352,6 +380,7 @@
       z-index: 999;
       display:none;
       max-width: min(520px, calc(100vw - 24px));
+      line-height:1.25;
     }
 
     /* Modal */
@@ -380,7 +409,7 @@
       gap:10px;
       margin-bottom:10px;
     }
-    .modalHeader h3{margin:0; font-size:16px}
+    .modalHeader h3{margin:0; font-size:16px; line-height:1.25}
     .modalBody{display:grid; gap:10px; margin-top:6px}
     .modalFooter{display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; margin-top:12px}
 
@@ -395,7 +424,7 @@
       }
 
       header{ margin-bottom:10px; gap:10px; }
-      h1{ font-size:18px; line-height:1.2; }
+      h1{ font-size:18px; line-height:1.18; }
 
       .pills{
         flex-wrap:nowrap;
@@ -449,6 +478,16 @@
 
       .layout{ gap:10px; margin-top:10px; }
       .card{ padding:12px; }
+
+      /* Side panel: default collapsed via JS; expanded gets a max height & internal scroll */
+      #sidePanel.expanded{
+        max-height: 62dvh;
+        overflow: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+      #sidePanel.collapsed #sideBody{
+        display:none;
+      }
     }
   </style>
 </head>
@@ -499,29 +538,35 @@ JD 收集：收藏喜欢的 JD，方便对照学习
 
     <div class="layout">
       <aside class="side card" id="sidePanel">
-        <div class="navTitle" id="boardTitle">企业清单</div>
-        <div class="boardList" id="boardList"></div>
-
-        <div style="margin-top:12px" class="navTitle" id="filterTitle">筛选</div>
-        <div class="row">
-          <div>
-            <label id="lblStatus">状态</label>
-            <select id="statusFilter"></select>
-          </div>
-          <div>
-            <label id="lblSource">渠道</label>
-            <select id="sourceFilter"></select>
-          </div>
+        <div class="sideHead">
+          <div class="navTitle" id="boardTitle">企业清单</div>
+          <button class="ghost" id="sideCollapseBtn" type="button">展开</button>
         </div>
 
-        <div style="margin-top:10px">
-          <label id="lblSearch">搜索</label>
-          <input id="searchInput" type="text" placeholder="公司 / 岗位 / 标签"/>
-          <div class="hint" id="searchHint" style="margin-top:6px">提示：状态筛选会只显示匹配的公司及其匹配岗位</div>
-        </div>
+        <div id="sideBody">
+          <div class="boardList" id="boardList"></div>
 
-        <div style="margin-top:12px" class="small" id="syncHint">
-          多人同时用（实时共享）需要云端数据库；目前可用“导出/导入 JSON”在设备之间同步或分享。
+          <div style="margin-top:12px" class="navTitle" id="filterTitle">筛选</div>
+          <div class="row">
+            <div>
+              <label id="lblStatus">状态</label>
+              <select id="statusFilter"></select>
+            </div>
+            <div>
+              <label id="lblSource">渠道</label>
+              <select id="sourceFilter"></select>
+            </div>
+          </div>
+
+          <div style="margin-top:10px">
+            <label id="lblSearch">搜索</label>
+            <input id="searchInput" type="text" placeholder="公司 / 岗位 / 标签"/>
+            <div class="hint" id="searchHint" style="margin-top:6px">提示：状态筛选会只显示匹配的公司及其匹配岗位</div>
+          </div>
+
+          <div style="margin-top:12px" class="small" id="syncHint">
+            多人同时用（实时共享）需要云端数据库；目前可用“导出/导入 JSON”在设备之间同步或分享。
+          </div>
         </div>
       </aside>
 
@@ -583,11 +628,6 @@ JD 收集：收藏喜欢的 JD，方便对照学习
         toastImported: "已导入 ✅",
         toastExported: "已导出 ✅",
         toastReset: "已重置 ✅",
-        toastCopied: "已复制 ✅",
-        companyNameZh: "公司中文名",
-        companyNameEn: "公司英文名",
-        companyTags: "标签（可选）",
-        companyNote: "备注（可选）",
         board: "清单",
         roleTitle: "岗位名称",
         location: "地点",
@@ -597,9 +637,6 @@ JD 收集：收藏喜欢的 JD，方便对照学习
         appliedDate: "投递日期",
         statusNow: "当前状态",
         sourceNow: "投递渠道",
-        sourceOfficial: "官网",
-        sourceReferral: "内推",
-        sourceOther: "其他",
         jdTitle: "JD 标题 / 岗位",
         jdCompany: "公司（可选）",
         jdUrl: "JD 链接（可选）",
@@ -613,7 +650,9 @@ JD 收集：收藏喜欢的 JD，方便对照学习
         dashLegend: "状态分布",
         showCompanies: "公司与岗位",
         showJd: "JD 列表",
-        showDash: "看板概览"
+        showDash: "看板概览",
+        sideExpand: "展开",
+        sideCollapse: "收起"
       },
       en: {
         title: "Job Tracker · Dashboard · JD Collection",
@@ -650,11 +689,6 @@ JD 收集：收藏喜欢的 JD，方便对照学习
         toastImported: "Imported ✅",
         toastExported: "Exported ✅",
         toastReset: "Reset ✅",
-        toastCopied: "Copied ✅",
-        companyNameZh: "Company (CN)",
-        companyNameEn: "Company (EN)",
-        companyTags: "Tags (optional)",
-        companyNote: "Notes (optional)",
         board: "List",
         roleTitle: "Role Title",
         location: "Location",
@@ -664,9 +698,6 @@ JD 收集：收藏喜欢的 JD，方便对照学习
         appliedDate: "Applied Date",
         statusNow: "Current Status",
         sourceNow: "Channel",
-        sourceOfficial: "Official",
-        sourceReferral: "Referral",
-        sourceOther: "Other",
         jdTitle: "JD Title / Role",
         jdCompany: "Company (optional)",
         jdUrl: "JD URL (optional)",
@@ -680,7 +711,9 @@ JD 收集：收藏喜欢的 JD，方便对照学习
         dashLegend: "Legend",
         showCompanies: "Companies & Roles",
         showJd: "JD List",
-        showDash: "Overview"
+        showDash: "Overview",
+        sideExpand: "Expand",
+        sideCollapse: "Collapse"
       }
     };
 
@@ -717,9 +750,10 @@ JD 收集：收藏喜欢的 JD，方便对照学习
     // -----------------------
     // State + storage
     // -----------------------
-    const STORAGE_KEY = "job_hunting_site_v2";
+    const STORAGE_KEY = "job_hunting_site_v3";
     const nowISO = () => new Date().toISOString().slice(0,10);
     const uid = () => Math.random().toString(16).slice(2) + Date.now().toString(16);
+    const isMobile = () => window.matchMedia && window.matchMedia("(max-width: 520px)").matches;
 
     const DEFAULT_BOARDS = [
       {
@@ -757,7 +791,6 @@ JD 收集：收藏喜欢的 JD，方便对照学习
     ];
 
     function defaultCompanies(){
-      // 少量预置：你可以删、也可以继续加
       const cnInternet = [
         { zh:"字节跳动", en:"ByteDance" },
         { zh:"腾讯", en:"Tencent" },
@@ -765,7 +798,7 @@ JD 收集：收藏喜欢的 JD，方便对照学习
         { zh:"美团", en:"Meituan" },
         { zh:"京东", en:"JD.com" },
         { zh:"百度", en:"Baidu" },
-        { zh:"拼多多", en:"PDD Holdings (Pinduoduo)" },
+        { zh:"拼多多", en:"PDD Holdings" },
         { zh:"网易", en:"NetEase" },
         { zh:"小米", en:"Xiaomi" },
         { zh:"快手", en:"Kuaishou" }
@@ -810,7 +843,6 @@ JD 收集：收藏喜欢的 JD，方便对照学习
       const companies = defaultCompanies();
       const boards = structuredClone(DEFAULT_BOARDS);
 
-      // assign companyIds
       for(const b of boards) b.companyIds = [];
       for(const c of companies){
         const b = boards.find(x => x.id === c.boardId) || boards.find(x => x.id === "personal");
@@ -818,11 +850,12 @@ JD 收集：收藏喜欢的 JD，方便对照学习
       }
 
       return {
-        version: 2,
+        version: 3,
         lang: "zh",
         activeTab: "companies",
         activeBoardId: "cn_internet",
         filters: { status:"all", source:"all", q:"" },
+        ui: { sideCollapsed: null }, // null -> first init decides based on device
         boards,
         companies,
         jd: []
@@ -837,10 +870,20 @@ JD 收集：收藏喜欢的 JD，方便对照学习
         if(!raw) return defaultState();
         const parsed = JSON.parse(raw);
         if(!parsed || !parsed.version) return defaultState();
-        // minimal migration
-        if(parsed.version !== 2){
-          return defaultState();
+        if(parsed.version !== 3){
+          const s = defaultState();
+          // 尽量保留老数据（如果结构相近）
+          if(parsed.companies) s.companies = parsed.companies;
+          if(parsed.boards) s.boards = parsed.boards;
+          if(parsed.jd) s.jd = parsed.jd;
+          if(parsed.lang) s.lang = parsed.lang;
+          if(parsed.activeTab) s.activeTab = parsed.activeTab;
+          if(parsed.activeBoardId) s.activeBoardId = parsed.activeBoardId;
+          if(parsed.filters) s.filters = parsed.filters;
+          if(parsed.ui) s.ui = { ...s.ui, ...parsed.ui };
+          return s;
         }
+        if(!parsed.ui) parsed.ui = { sideCollapsed: null };
         return parsed;
       }catch(e){
         return defaultState();
@@ -858,7 +901,7 @@ JD 收集：收藏喜欢的 JD，方便对照学习
     }
     function scheduleSave(){
       clearTimeout(saveTimer);
-      saveTimer = setTimeout(()=>saveState(false), 200);
+      saveTimer = setTimeout(()=>saveState(false), 220);
     }
 
     // -----------------------
@@ -902,6 +945,8 @@ JD 收集：收藏喜欢的 JD，方便对照学习
       if(wrap && btn){
         btn.textContent = wrap.classList.contains("collapsed") ? t().toggleDescOpen : t().toggleDescClose;
       }
+
+      syncSideCollapseUI(); // important: language changes
     }
 
     function statusLabel(key){
@@ -921,9 +966,42 @@ JD 收集：收藏喜欢的 JD，方便对照学习
     function normalize(s){ return (s||"").toLowerCase().trim(); }
 
     // -----------------------
+    // Side collapse (bug fix)
+    // -----------------------
+    function ensureSideDefault(){
+      if(state.ui.sideCollapsed === null || typeof state.ui.sideCollapsed === "undefined"){
+        // 手机端默认收起；电脑端默认展开
+        state.ui.sideCollapsed = isMobile();
+        scheduleSave();
+      }
+      syncSideCollapseUI();
+    }
+
+    function syncSideCollapseUI(){
+      const side = $("#sidePanel");
+      const btn = $("#sideCollapseBtn");
+      if(!side || !btn) return;
+
+      const collapsed = !!state.ui.sideCollapsed;
+
+      side.classList.toggle("collapsed", collapsed);
+      side.classList.toggle("expanded", !collapsed);
+
+      // 收起后只留标题：CSS 已隐藏 #sideBody
+      btn.textContent = collapsed ? t().sideExpand : t().sideCollapse;
+    }
+
+    function toggleSide(){
+      state.ui.sideCollapsed = !state.ui.sideCollapsed;
+      scheduleSave();
+      syncSideCollapseUI();
+    }
+
+    // -----------------------
     // Render
     // -----------------------
     function render(){
+      ensureSideDefault();
       setText();
       renderBoards();
       renderFilters();
@@ -942,7 +1020,6 @@ JD 收集：收藏喜欢的 JD，方便对照学习
         const active = el.dataset.tab === state.activeTab;
         el.classList.toggle("active", active);
       });
-      // side panel hint - keep for all tabs for simplicity
     }
 
     function renderBoards(){
@@ -1006,7 +1083,6 @@ JD 收集：收藏喜欢的 JD，方便对照学习
       return state.companies.filter(c=>ids.has(c.id));
     }
 
-    // status filter applies to roles; company only shown if it has matching roles (unless status=all)
     function roleMatchesFilter(role){
       const f = state.filters;
       const statusOk = f.status === "all" ? true : (role.status === f.status);
@@ -1029,12 +1105,10 @@ JD 收集：收藏喜欢的 JD，方便对照学习
       const companyTextOk = q ? companyText.includes(q) : true;
 
       if(f.status === "all" && f.source === "all"){
-        // only search affects company itself even without roles
         if(q) return companyTextOk || (company.roles||[]).some(r => roleMatchesFilter(r));
         return true;
       }
 
-      // status/source filtering: show company only if it has matching roles
       return (company.roles||[]).some(r => roleMatchesFilter(r)) || (q && companyTextOk);
     }
 
@@ -1047,7 +1121,7 @@ JD 收集：收藏喜欢的 JD，方便对照学习
       title.innerHTML = `
         <div>
           <h2>${t().showCompanies}</h2>
-          <div class="muted">${state.lang==="zh" ? "公司下可添加多个岗位。状态筛选会只显示匹配的公司及其匹配岗位。" : "You can add multiple roles under a company. Status filter shows matched companies & matched roles only."}</div>
+          <div class="muted">${state.lang==="zh" ? "公司下可添加多个岗位。状态/渠道筛选时，只显示匹配的公司及其匹配岗位。" : "Add multiple roles under a company. Status/channel filters show matched companies and matched roles only."}</div>
         </div>
         <div class="chips" id="companyChips"></div>
       `;
@@ -1125,7 +1199,6 @@ JD 收集：收藏喜欢的 JD，方便对照学习
         <div class="posList" data-role-list></div>
       `;
 
-      // actions
       div.querySelector('[data-act="addRole"]').addEventListener("click", ()=> openRoleModal(company.id));
       div.querySelector('[data-act="edit"]').addEventListener("click", ()=> openCompanyModal(company.id));
       div.querySelector('[data-act="delete"]').addEventListener("click", ()=> deleteCompany(company.id));
@@ -1193,7 +1266,6 @@ JD 收集：收藏喜欢的 JD，方便对照学习
         </div>
       `;
 
-      // fill selects
       const statusSel = div.querySelector('select[data-field="status"]');
       STATUS.filter(s=>s.key!=="all").forEach(s=>{
         const opt = document.createElement("option");
@@ -1212,7 +1284,6 @@ JD 收集：收藏喜欢的 JD，方便对照学习
       });
       srcSel.value = role.source || "official";
 
-      // quick change saves
       const onChange = () => {
         const company = state.companies.find(c=>c.id===companyId);
         if(!company) return;
@@ -1227,7 +1298,7 @@ JD 收集：收藏喜欢的 JD，方便对照学习
 
         r.updatedAt = new Date().toISOString();
         scheduleSave();
-        render(); // reflect filter impact immediately
+        render();
       };
 
       statusSel.addEventListener("change", onChange);
@@ -1236,7 +1307,6 @@ JD 收集：收藏喜欢的 JD，方便对照学习
         inp.addEventListener("change", onChange);
       });
 
-      // actions
       const openBtn = div.querySelector('[data-act="open"]');
       if(openBtn) openBtn.addEventListener("click", ()=> window.open(role.link, "_blank", "noopener,noreferrer"));
       div.querySelector('[data-act="edit"]').addEventListener("click", ()=> openRoleModal(companyId, role.id));
@@ -1269,7 +1339,7 @@ JD 收集：收藏喜欢的 JD，方便对照学习
       title.innerHTML = `
         <div>
           <h2>${t().showDash}</h2>
-          <div class="muted">${state.lang==="zh" ? "看板统计以“岗位”为单位；支持统计官网投递数。" : "Dashboard metrics are role-based; includes official-site apply count."}</div>
+          <div class="muted">${state.lang==="zh" ? "看板统计以“岗位”为单位；支持统计官网投递数（渠道=官网）。" : "Dashboard metrics are role-based; includes official-site apply count (channel=Official)."}</div>
         </div>
         <div class="chips"></div>
       `;
@@ -1277,7 +1347,7 @@ JD 收集：收藏喜欢的 JD，方便对照学习
 
       const allCompanies = state.companies;
       const allRoles = allCompanies.flatMap(c => c.roles || []);
-      const official = allRoles.filter(r => r.source === "official" && ["applied","oa","hr","interview","offer","rejected","hold","interested"].includes(r.status)).length;
+      const official = allRoles.filter(r => r.source === "official").length;
       const active = allRoles.filter(r => !["offer","rejected"].includes(r.status)).length;
 
       const grid = document.createElement("div");
@@ -1299,14 +1369,6 @@ JD 收集：收藏喜欢的 JD，方便对照学习
         <div class="kpi"><div class="label">${t().dashKpiActive}</div><div class="value">${active}</div></div>
       `;
       left.appendChild(kpis);
-
-      const info = document.createElement("div");
-      info.className = "small";
-      info.style.marginTop = "10px";
-      info.textContent = state.lang==="zh"
-        ? "提示：要准确统计“官网投递”，在岗位里把渠道选择为「官网」。"
-        : "Tip: To count official applications, set role channel to “Official”.";
-      left.appendChild(info);
 
       const right = document.createElement("div");
       right.className = "card";
@@ -1342,17 +1404,13 @@ JD 收集：收藏喜欢的 JD，方便对照学习
       wrap.appendChild(grid);
       main.appendChild(wrap);
 
-      // draw chart
       const counts = countByStatus(allRoles);
       drawDonut(canvas, counts);
 
-      // legend
       legend.innerHTML = "";
       const showKeys = ["interested","applied","oa","hr","interview","offer","rejected","hold"];
       for(const k of showKeys){
         const n = counts[k] || 0;
-        if(allRoles.length === 0 && n===0) continue;
-
         const item = document.createElement("div");
         item.className = "legendItem";
 
@@ -1378,7 +1436,6 @@ JD 收集：收藏喜欢的 JD，方便对照学习
         legend.appendChild(item);
       }
 
-      // responsive redraw
       window.requestAnimationFrame(()=> {
         const ro = new ResizeObserver(()=> drawDonut(canvas, counts));
         ro.observe(canvas);
@@ -1392,7 +1449,6 @@ JD 收集：收藏喜欢的 JD，方便对照学习
         const k = r.status || "interested";
         out[k] = (out[k]||0) + 1;
       }
-      // ensure keys
       ["interested","applied","oa","hr","interview","offer","rejected","hold"].forEach(k=> out[k]=out[k]||0);
       return out;
     }
@@ -1411,7 +1467,6 @@ JD 收集：收藏喜欢的 JD，方便对照学习
       const keys = ["interested","applied","oa","hr","interview","offer","rejected","hold"];
       const total = keys.reduce((a,k)=>a+(counts[k]||0),0);
 
-      // background ring
       const cx = w/2, cy = h/2;
       const R = Math.min(w,h) * 0.33;
       const r = R * 0.62;
@@ -1450,14 +1505,12 @@ JD 收集：收藏喜欢的 JD，方便对照学习
         start += ang;
       }
 
-      // inner cut
       ctx.globalAlpha = 1;
       ctx.beginPath();
       ctx.arc(cx, cy, r, 0, Math.PI*2);
       ctx.fillStyle = "rgba(10,14,28,.92)";
       ctx.fill();
 
-      // center text
       ctx.fillStyle = "rgba(233,236,255,.9)";
       ctx.font = `${Math.floor(20*dpr)}px ${getComputedStyle(document.body).fontFamily}`;
       ctx.textAlign = "center";
@@ -1495,7 +1548,6 @@ JD 收集：收藏喜欢的 JD，方便对照学习
         empty.textContent = state.lang==="zh" ? "还没有 JD，点右上角「新增 JD」。" : "No JDs yet. Click “Add JD”.";
         wrap.appendChild(empty);
       }else{
-        // basic search filter applies too
         const q = normalize(state.filters.q);
         const jdItems = state.jd.filter(j=>{
           if(!q) return true;
@@ -1527,7 +1579,7 @@ JD 收集：收藏喜欢的 JD，方便对照学习
         <div class="jdTop">
           <div>
             <div class="jdTitle">${escapeHtml(jd.title || "—")}</div>
-            <div class="jdSub">${escapeHtml([jd.company, jd.url ? "" : ""].filter(Boolean).join(" · "))}</div>
+            <div class="jdSub">${escapeHtml([jd.company].filter(Boolean).join(" · "))}</div>
             ${jd.url ? `<div class="jdSub"><a href="${escapeAttr(jd.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(jd.url)}</a></div>` : ""}
           </div>
           <div class="jdActions">
@@ -1569,23 +1621,17 @@ JD 收集：收藏喜欢的 JD，方便对照学习
       const editing = !!companyId;
       const company = editing ? state.companies.find(c=>c.id===companyId) : null;
 
-      const fZh = field(t().companyNameZh, "text", company?.nameZh || "");
-      const fEn = field(t().companyNameEn, "text", company?.nameEn || "");
-      const fTags = field(t().companyTags, "text", (company?.tags||[]).join(", "));
-      const fNote = textareaField(t().companyNote, company?.note || "");
+      const fZh = field(state.lang==="zh" ? "公司中文名" : "Company (CN)", "text", company?.nameZh || "");
+      const fEn = field(state.lang==="zh" ? "公司英文名" : "Company (EN)", "text", company?.nameEn || "");
+      const fTags = field(state.lang==="zh" ? "标签（可选）" : "Tags (optional)", "text", (company?.tags||[]).join(", "));
+      const fNote = textareaField(state.lang==="zh" ? "备注（可选）" : "Notes (optional)", company?.note || "");
 
       const boardSel = selectField(t().board,
         state.boards.map(b=>({value:b.id, label: (state.lang==="zh"?b.zh:b.en)})),
         company?.boardId || state.activeBoardId
       );
 
-      const bodyNodes = [
-        fZh.wrap,
-        fEn.wrap,
-        boardSel.wrap,
-        fTags.wrap,
-        fNote.wrap
-      ];
+      const bodyNodes = [fZh.wrap, fEn.wrap, boardSel.wrap, fTags.wrap, fNote.wrap];
 
       const btnCancel = makeBtn(t().btnCancel, "secondary", ()=> closeModal());
       const btnSave = makeBtn(t().btnSave, "", ()=>{
@@ -1647,16 +1693,7 @@ JD 收集：收藏喜欢的 JD，方便对照学习
         role?.source || "official"
       );
 
-      const bodyNodes = [
-        fTitle.wrap,
-        statusSel.wrap,
-        sourceSel.wrap,
-        fLoc.wrap,
-        fSal.wrap,
-        fDate.wrap,
-        fLink.wrap,
-        fNote.wrap
-      ];
+      const bodyNodes = [fTitle.wrap, statusSel.wrap, sourceSel.wrap, fLoc.wrap, fSal.wrap, fDate.wrap, fLink.wrap, fNote.wrap];
 
       const btnCancel = makeBtn(t().btnCancel, "secondary", ()=> closeModal());
       const btnSave = makeBtn(t().btnSave, "", ()=>{
@@ -1797,7 +1834,6 @@ JD 收集：收藏喜欢的 JD，方便对照学习
       const b = state.boards.find(x=>x.id===boardId);
       if(!b) return;
       if(!b.companyIds.includes(companyId)) b.companyIds.unshift(companyId);
-      // also ensure removed elsewhere
       for(const bb of state.boards){
         if(bb.id!==boardId){
           bb.companyIds = bb.companyIds.filter(id=>id!==companyId);
@@ -1858,16 +1894,18 @@ JD 收集：收藏喜欢的 JD，方便对照学习
         try{
           const parsed = JSON.parse(reader.result);
           if(!parsed || typeof parsed !== "object") throw new Error("invalid");
-          // accept either our format or something close
-          if(!parsed.version) parsed.version = 2;
+
+          if(!parsed.version) parsed.version = 3;
           state = parsed;
-          // ensure required fields
+
           if(!state.boards) state.boards = structuredClone(DEFAULT_BOARDS);
           if(!state.companies) state.companies = [];
           if(!state.jd) state.jd = [];
           if(!state.filters) state.filters = {status:"all", source:"all", q:""};
           if(!state.activeTab) state.activeTab = "companies";
           if(!state.activeBoardId) state.activeBoardId = state.boards?.[0]?.id || "personal";
+          if(!state.ui) state.ui = { sideCollapsed: null };
+
           saveState(false);
           toast(t().toastImported);
           render();
@@ -1905,7 +1943,6 @@ JD 收集：收藏喜欢的 JD，方便对照学习
     // Events
     // -----------------------
     function bind(){
-      // tabs
       $$(".tab").forEach(el=>{
         el.addEventListener("click", ()=>{
           state.activeTab = el.dataset.tab;
@@ -1914,21 +1951,21 @@ JD 收集：收藏喜欢的 JD，方便对照学习
         });
       });
 
-      // language
       $("#langBtn").addEventListener("click", ()=>{
         state.lang = (state.lang==="zh" ? "en" : "zh");
         scheduleSave();
         render();
       });
 
-      // collapsible description
       $("#subToggle").addEventListener("click", ()=>{
         const wrap = $("#subWrap");
         wrap.classList.toggle("collapsed");
         $("#subToggle").textContent = wrap.classList.contains("collapsed") ? t().toggleDescOpen : t().toggleDescClose;
       });
 
-      // filters
+      // ✅ 企业清单收起/展开（bug fix）
+      $("#sideCollapseBtn").addEventListener("click", toggleSide);
+
       $("#statusFilter").addEventListener("change", (e)=>{
         state.filters.status = e.target.value;
         scheduleSave();
@@ -1945,7 +1982,6 @@ JD 收集：收藏喜欢的 JD，方便对照学习
         render();
       });
 
-      // toolbar
       $("#exportBtn").addEventListener("click", exportJSON);
       $("#importBtn").addEventListener("click", ()=> $("#importFile").click());
       $("#importFile").addEventListener("change", (e)=>{
@@ -1958,13 +1994,18 @@ JD 收集：收藏喜欢的 JD，方便对照学习
       $("#addJdBtn").addEventListener("click", ()=> openJdModal(null));
       $("#resetBtn").addEventListener("click", resetAll);
 
-      // modal
       $("#modalCloseBtn").addEventListener("click", closeModal);
       $("#modalBackdrop").addEventListener("click", (e)=>{
         if(e.target.id === "modalBackdrop") closeModal();
       });
       window.addEventListener("keydown", (e)=>{
         if(e.key === "Escape") closeModal();
+      });
+
+      // 手机/桌面切换时：只在首次默认逻辑生效；之后按用户选择保持
+      window.addEventListener("resize", ()=>{
+        // 不强制改用户选择，只刷新 UI class
+        syncSideCollapseUI();
       });
     }
 
